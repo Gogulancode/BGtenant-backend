@@ -23,6 +23,9 @@ describe("SettingsService", () => {
       create: jest.fn(),
       upsert: jest.fn(),
     },
+    subscription: {
+      findFirst: jest.fn(),
+    },
     $transaction: jest.fn(),
   } as any;
 
@@ -45,6 +48,7 @@ describe("SettingsService", () => {
     prisma.user.findFirst.mockResolvedValue({ id: "user-1" });
     prisma.tenant.findUnique.mockResolvedValue(tenantResponse);
     prisma.userPreference.findUnique.mockResolvedValue(null);
+    prisma.subscription.findFirst.mockResolvedValue(null);
     prisma.userPreference.create.mockResolvedValue({
       userId: "user-1",
       timezone: "UTC",

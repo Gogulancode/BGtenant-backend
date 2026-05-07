@@ -6,17 +6,21 @@ import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const corsOrigins = (process.env.FRONTEND_ORIGINS || [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3002",
+    "http://localhost:8080",
+    "http://localhost:8081",
+    "http://localhost:5173",
+  ].join(","))
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
 
   // Enable CORS with specific configuration
   app.enableCors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "http://localhost:3002",
-      "http://localhost:8080",
-      "http://localhost:8081",
-      "http://localhost:5173", // Vite default
-    ],
+    origin: corsOrigins,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     credentials: true,
     allowedHeaders: "Content-Type,Authorization",

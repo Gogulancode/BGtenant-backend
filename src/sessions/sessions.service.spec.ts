@@ -90,7 +90,7 @@ describe("SessionsService", () => {
     });
     expect(actionLog.record).toHaveBeenCalledWith(
       "admin-1",
-      "sessions",
+      "tenant-a",
       "REVOKE_SESSION",
       "session-2",
       expect.objectContaining({ targetUserId: "target-user" }),

@@ -80,8 +80,8 @@ describe("MetricsService", () => {
       });
       expect(actionLog.record).toHaveBeenCalledWith(
         "user-1",
-        "metrics",
-        "UPDATE",
+        "tenant-1",
+        "UPDATE_METRIC",
         "metric-1",
         { target: 20 },
       );
