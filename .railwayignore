@@ -1,0 +1,8 @@
+node_modules
+dist
+coverage
+logs
+outputs
+.codex-spreadsheet-inspect
+.env
+.git
