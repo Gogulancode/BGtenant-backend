@@ -1,0 +1,5960 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/v1/auth/register": {
+      "post": {
+        "operationId": "AuthController_register",
+        "summary": "Register new user",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "summary": "Login user",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "operationId": "AuthController_refresh",
+        "summary": "Refresh access token",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "summary": "Logout user",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/mfa/enroll": {
+      "post": {
+        "operationId": "AuthController_enrollMfa",
+        "summary": "Start MFA enrollment",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/mfa/enable": {
+      "post": {
+        "operationId": "AuthController_enableMfa",
+        "summary": "Enable MFA",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MfaCodeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/mfa/disable": {
+      "post": {
+        "operationId": "AuthController_disableMfa",
+        "summary": "Disable MFA",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MfaCodeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/accept-invite": {
+      "post": {
+        "operationId": "AuthController_acceptInvite",
+        "summary": "Accept tenant invitation",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptInviteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "operationId": "AuthController_getMe",
+        "summary": "Get current user",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/onboarding": {
+      "get": {
+        "operationId": "OnboardingController_getProgress",
+        "summary": "Get onboarding progress",
+        "description": "Returns the current onboarding progress for the authenticated tenant. Creates a default record if none exists.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Onboarding progress retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnboardingProgressResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          },
+          "404": {
+            "description": "Tenant not found"
+          }
+        },
+        "tags": [
+          "Onboarding"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "OnboardingController_updateProgress",
+        "summary": "Update onboarding progress",
+        "description": "Updates the onboarding progress for the authenticated tenant. Can advance steps, mark steps as completed, or mark the entire onboarding as complete.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOnboardingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Onboarding progress updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnboardingProgressResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data or step skipping attempt"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          },
+          "404": {
+            "description": "Tenant not found"
+          }
+        },
+        "tags": [
+          "Onboarding"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/onboarding/profile": {
+      "patch": {
+        "operationId": "OnboardingController_updateProfile",
+        "summary": "Update profile for onboarding (Step 1)",
+        "description": "Updates the user profile with personal and business information during onboarding.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileOnboardingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileOnboardingResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Onboarding"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/onboarding/business-identity": {
+      "get": {
+        "operationId": "OnboardingController_getBusinessIdentity",
+        "summary": "Get business identity",
+        "description": "Retrieves the business identity configuration for the tenant.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Business identity retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BusinessIdentityResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Onboarding"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "OnboardingController_upsertBusinessIdentity",
+        "summary": "Update business identity (Step 2)",
+        "description": "Creates or updates the business identity information including company type, industry, and turnover.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BusinessIdentityDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Business identity saved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BusinessIdentityResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Onboarding"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/onboarding/sales-plan": {
+      "get": {
+        "operationId": "OnboardingController_getSalesPlan",
+        "summary": "Get sales plan",
+        "description": "Retrieves the sales plan with historical data and projections.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Sales plan retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesPlanResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Onboarding"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "OnboardingController_upsertSalesPlan",
+        "summary": "Update sales plan (Step 3)",
+        "description": "Creates or updates the sales plan with 3-year historical data, projected revenue, and monthly contribution percentages. Monthly targets are automatically calculated.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SalesPlanDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sales plan saved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesPlanResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data or monthly contribution percentages do not sum to 100%"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Onboarding"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/onboarding/activity-setup": {
+      "get": {
+        "operationId": "OnboardingController_getActivityConfiguration",
+        "summary": "Get activity configuration",
+        "description": "Retrieves the activity tracking configuration for the tenant.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Activity configuration retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivityConfigurationResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Onboarding"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "OnboardingController_upsertActivityConfiguration",
+        "summary": "Update activity configuration (Step 4)",
+        "description": "Creates or updates the activity tracking configuration including enabled categories, weekly goals, and reminder settings.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivityConfigurationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Activity configuration saved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivityConfigurationResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Onboarding"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/onboarding/sales-cycle": {
+      "get": {
+        "operationId": "OnboardingController_getSalesCycleStages",
+        "summary": "Get sales cycle stages",
+        "description": "Retrieves the configured sales cycle pipeline stages.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Sales cycle stages retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesCycleSetupResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Onboarding"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "OnboardingController_replaceSalesCycleStages",
+        "summary": "Update sales cycle stages (Step 5)",
+        "description": "Replaces all sales cycle stages with the provided configuration. Minimum 2 stages, maximum 10 stages required.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SalesCycleSetupDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sales cycle stages saved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesCycleSetupResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data or duplicate order numbers"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Onboarding"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/onboarding/sales-cycle/defaults": {
+      "post": {
+        "operationId": "OnboardingController_initializeDefaultSalesCycle",
+        "summary": "Initialize default sales cycle",
+        "description": "Creates a default sales cycle pipeline with Lead, Qualified, Proposal, Negotiation, and Closed Won stages.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Default sales cycle created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesCycleSetupResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Onboarding"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/onboarding/achievement-stages": {
+      "get": {
+        "operationId": "OnboardingController_getAchievementStages",
+        "summary": "Get achievement stages",
+        "description": "Retrieves the configured achievement milestone stages.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Achievement stages retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AchievementStagesSetupResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Onboarding"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "OnboardingController_replaceAchievementStages",
+        "summary": "Update achievement stages (Step 6)",
+        "description": "Replaces all achievement stages with the provided configuration. Minimum 2 stages, maximum 10 stages required.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AchievementStagesSetupDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Achievement stages saved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AchievementStagesSetupResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data or duplicate order numbers"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Onboarding"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/onboarding/subscription": {
+      "get": {
+        "operationId": "OnboardingController_getSelectedSubscription",
+        "summary": "Get selected subscription",
+        "description": "Retrieves the subscription plan selected during onboarding.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Selected subscription retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionSelectionResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Onboarding"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "OnboardingController_selectSubscription",
+        "summary": "Select subscription plan (Step 7)",
+        "description": "Selects a subscription plan for the tenant. The actual subscription is created when onboarding is completed.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionSelectionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription plan selected successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionSelectionResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid subscription plan"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Onboarding"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/onboarding/complete": {
+      "post": {
+        "operationId": "OnboardingController_completeOnboarding",
+        "summary": "Complete onboarding (Step 8)",
+        "description": "Marks the onboarding as complete. Validates that all required steps are completed before allowing completion. Creates the actual subscription based on the selected plan.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Onboarding completed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnboardingProgressResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Not all required steps are completed"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          },
+          "404": {
+            "description": "Onboarding progress not found"
+          }
+        },
+        "tags": [
+          "Onboarding"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/users/me": {
+      "get": {
+        "operationId": "UserController_getProfile",
+        "summary": "Get current user profile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Current tenant user profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "user_123",
+                    "name": "Ava Growth",
+                    "email": "ava@example.com",
+                    "businessType": "Startup",
+                    "role": "TENANT_ADMIN",
+                    "isActive": true,
+                    "timezone": "America/New_York",
+                    "notificationsEmail": true,
+                    "notificationsPush": true,
+                    "createdAt": "2025-11-15T12:00:00.000Z",
+                    "updatedAt": "2025-11-15T12:05:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "UserController_updateProfile",
+        "summary": "Update user profile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated tenant user profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "user_123",
+                    "name": "Ava Growth",
+                    "email": "ava@example.com",
+                    "businessType": "Startup",
+                    "role": "TENANT_ADMIN",
+                    "isActive": true,
+                    "timezone": "America/New_York",
+                    "notificationsEmail": true,
+                    "notificationsPush": true,
+                    "createdAt": "2025-11-15T12:00:00.000Z",
+                    "updatedAt": "2025-11-15T12:05:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "operationId": "UserController_listTenantUsers",
+        "summary": "List users in my tenant (admin only)",
+        "parameters": [
+          {
+            "name": "includeInactive",
+            "required": false,
+            "in": "query",
+            "description": "Include inactive / archived users",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "role",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "TENANT_ADMIN",
+                "MANAGER",
+                "STAFF",
+                "VIEWER"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Filtered list of tenant users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": [
+                    {
+                      "id": "user_123",
+                      "name": "Ava Growth",
+                      "email": "ava@example.com",
+                      "businessType": "Startup",
+                      "role": "TENANT_ADMIN",
+                      "isActive": true,
+                      "timezone": "America/New_York",
+                      "notificationsEmail": true,
+                      "notificationsPush": true,
+                      "createdAt": "2025-11-15T12:00:00.000Z",
+                      "updatedAt": "2025-11-15T12:05:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "UserController_inviteTenantUser",
+        "summary": "Invite new tenant user (TENANT_ADMIN)",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteTenantUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Invitation created and notification queued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "invitationId": "inv_123",
+                    "expiresAt": "2025-11-18T12:00:00.000Z",
+                    "user": {
+                      "id": "user_123",
+                      "name": "Ava Growth",
+                      "email": "ava@example.com",
+                      "businessType": "Startup",
+                      "role": "TENANT_ADMIN",
+                      "isActive": true,
+                      "timezone": "America/New_York",
+                      "notificationsEmail": true,
+                      "notificationsPush": true,
+                      "createdAt": "2025-11-15T12:00:00.000Z",
+                      "updatedAt": "2025-11-15T12:05:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/users/{id}/role": {
+      "put": {
+        "operationId": "UserController_updateTenantUserRole",
+        "summary": "Update tenant user role (TENANT_ADMIN)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTenantUserRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tenant user role updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "user_123",
+                    "name": "Ava Growth",
+                    "email": "ava@example.com",
+                    "businessType": "Startup",
+                    "role": "TENANT_ADMIN",
+                    "isActive": true,
+                    "timezone": "America/New_York",
+                    "notificationsEmail": true,
+                    "notificationsPush": true,
+                    "createdAt": "2025-11-15T12:00:00.000Z",
+                    "updatedAt": "2025-11-15T12:05:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/users/{id}/status": {
+      "patch": {
+        "operationId": "UserController_updateTenantUserStatus",
+        "summary": "Activate or deactivate tenant user (TENANT_ADMIN)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTenantUserStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tenant user status updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "user_123",
+                    "name": "Ava Growth",
+                    "email": "ava@example.com",
+                    "businessType": "Startup",
+                    "role": "TENANT_ADMIN",
+                    "isActive": true,
+                    "timezone": "America/New_York",
+                    "notificationsEmail": true,
+                    "notificationsPush": true,
+                    "createdAt": "2025-11-15T12:00:00.000Z",
+                    "updatedAt": "2025-11-15T12:05:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/business/snapshot": {
+      "post": {
+        "operationId": "BusinessController_upsertSnapshot",
+        "summary": "Create or update business snapshot",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SnapshotDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Saved business snapshot"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Business"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "BusinessController_getSnapshot",
+        "summary": "Get business snapshot",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Current business snapshot"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Business"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/business/nsm": {
+      "get": {
+        "operationId": "BusinessController_getNSM",
+        "summary": "Get suggested North Star Metric (NSM)",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Suggested NSM"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Business"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/business/summary": {
+      "get": {
+        "operationId": "BusinessController_getSummary",
+        "summary": "Get business summary for dashboard readiness",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Business readiness summary"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Business"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/metrics": {
+      "get": {
+        "operationId": "MetricsController_getAllMetrics",
+        "summary": "Get all metrics with recent logs",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search query string",
+            "schema": {
+              "example": "revenue",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "description": "Sort field and direction (e.g., createdAt:desc, name:asc)",
+            "schema": {
+              "example": "createdAt:desc",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Metrics with latest log entries"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Metrics"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "MetricsController_createMetric",
+        "summary": "Create new metric",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMetricDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Metric created"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Metrics"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/metrics/{id}/logs": {
+      "post": {
+        "operationId": "MetricsController_createLog",
+        "summary": "Create metric log entry",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMetricLogDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Metric log appended"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Metrics"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "MetricsController_getLogs",
+        "summary": "List logs for a metric",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "ISO date string for log range start",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "ISO date string for log range end",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Max number of logs to return",
+            "schema": {
+              "default": 25,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Metric logs"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Metrics"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/metrics/summary": {
+      "get": {
+        "operationId": "MetricsController_getSummary",
+        "summary": "Get metric summary for dashboard",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Aggregated metric summary"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Metrics"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/metrics/{id}": {
+      "get": {
+        "operationId": "MetricsController_getMetric",
+        "summary": "Get a single metric",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Metric details"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Metrics"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "MetricsController_updateMetric",
+        "summary": "Update an existing metric",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMetricDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Metric updated"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Metrics"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "MetricsController_deleteMetric",
+        "summary": "Delete a metric",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Metric deleted"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Metrics"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/metrics/{id}/trend": {
+      "get": {
+        "operationId": "MetricsController_getTrend",
+        "summary": "Get metric trend data",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Metric trend data points"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Metrics"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/outcomes": {
+      "get": {
+        "operationId": "OutcomesController_getOutcomes",
+        "summary": "Get outcomes for current user",
+        "parameters": [
+          {
+            "name": "weekStart",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search query string",
+            "schema": {
+              "example": "revenue",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "description": "Sort field and direction (e.g., createdAt:desc, name:asc)",
+            "schema": {
+              "example": "createdAt:desc",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Weekly outcomes for the tenant user"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Outcomes"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "OutcomesController_createOutcome",
+        "summary": "Create new outcome",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOutcomeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Outcome created"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Outcomes"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/outcomes/{id}": {
+      "put": {
+        "operationId": "OutcomesController_updateOutcome",
+        "summary": "Update outcome",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOutcomeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Outcome updated"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Outcomes"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "OutcomesController_deleteOutcome",
+        "summary": "Delete outcome",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Outcome deleted"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Outcomes"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/outcomes/carry-forward": {
+      "post": {
+        "operationId": "OutcomesController_carryForward",
+        "summary": "Carry forward missed outcomes to next week",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Carry-forward result summary"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Outcomes"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/outcomes/summary": {
+      "get": {
+        "operationId": "OutcomesController_getSummary",
+        "summary": "Get outcomes summary for dashboard cards",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Dashboard-ready outcomes summary"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Outcomes"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/outcomes/completion-rate": {
+      "get": {
+        "operationId": "OutcomesController_getCompletionRate",
+        "summary": "Get completion rate trend for recent weeks",
+        "parameters": [
+          {
+            "name": "weeks",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Completion rate per week"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Outcomes"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/reviews": {
+      "get": {
+        "operationId": "ReviewsController_getReviews",
+        "summary": "Get reviews",
+        "parameters": [
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "Daily",
+                "Weekly"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reviews filtered by type"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Reviews"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "ReviewsController_createReview",
+        "summary": "Create review",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReviewDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Review created"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Reviews"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/reviews/summary": {
+      "get": {
+        "operationId": "ReviewsController_getSummary",
+        "summary": "Get review summary for dashboard",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Review dashboard summary"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Reviews"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/sales/planning": {
+      "get": {
+        "operationId": "SalesController_getSalesPlanning",
+        "summary": "Get sales planning for year",
+        "parameters": [
+          {
+            "name": "year",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": 2025,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sales planning configuration"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Sales"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "SalesController_upsertSalesPlanning",
+        "summary": "Create or update sales planning",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertSalesPlanningDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Sales planning saved"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Sales"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/sales/tracker": {
+      "get": {
+        "operationId": "SalesController_getSalesTracker",
+        "summary": "Get sales tracker for month",
+        "parameters": [
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2025-10",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Monthly sales tracker"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Sales"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "SalesController_upsertSalesTracker",
+        "summary": "Create or update sales tracker",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertSalesTrackerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Sales tracker saved"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Sales"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/sales/summary": {
+      "get": {
+        "operationId": "SalesController_getSummary",
+        "summary": "Get sales dashboard summary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Sales dashboard summary"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Sales"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/sales/trackers": {
+      "get": {
+        "operationId": "SalesController_getAllSalesTrackers",
+        "summary": "Get all sales trackers with pagination",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search query string",
+            "schema": {
+              "example": "revenue",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "description": "Sort field and direction (e.g., createdAt:desc, name:asc)",
+            "schema": {
+              "example": "createdAt:desc",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of sales trackers"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Sales"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/activities": {
+      "get": {
+        "operationId": "ActivitiesController_getAllActivities",
+        "summary": "Get all activities with optional filters and pagination",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search query string",
+            "schema": {
+              "example": "revenue",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "description": "Sort field and direction (e.g., createdAt:desc, name:asc)",
+            "schema": {
+              "example": "createdAt:desc",
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "Filter by category (Leads, Sales, Operations, etc.)",
+            "schema": {
+              "example": "Sales",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by status",
+            "schema": {
+              "example": "Active",
+              "enum": [
+                "Active",
+                "Completed",
+                "Cancelled"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "priority",
+            "required": false,
+            "in": "query",
+            "description": "Filter by priority",
+            "schema": {
+              "example": "High",
+              "enum": [
+                "Low",
+                "Medium",
+                "High"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "dueDateFrom",
+            "required": false,
+            "in": "query",
+            "description": "Filter activities due on or after this date (ISO 8601)",
+            "schema": {
+              "example": "2025-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "dueDateTo",
+            "required": false,
+            "in": "query",
+            "description": "Filter activities due on or before this date (ISO 8601)",
+            "schema": {
+              "example": "2025-12-31",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns paginated activities assigned to the authenticated tenant user"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Activities"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "ActivitiesController_createActivity",
+        "summary": "Create activity",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateActivityDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Activity created for current tenant"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Activities"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/activities/{id}": {
+      "put": {
+        "operationId": "ActivitiesController_updateActivity",
+        "summary": "Update activity",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateActivityDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated activity details"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Activities"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "ActivitiesController_deleteActivity",
+        "summary": "Delete activity",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Activity deleted"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Activities"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/activities/summary": {
+      "get": {
+        "operationId": "ActivitiesController_getSummary",
+        "summary": "Get activities summary for dashboard",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Aggregated activity summary"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Activities"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/insights": {
+      "get": {
+        "operationId": "InsightsController_getInsights",
+        "summary": "Get user insights (momentum, flags, streaks)",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Current insight record for the authenticated tenant user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "insight_123",
+                    "userId": "user_123",
+                    "tenantId": "tenant_123",
+                    "momentumScore": 72.5,
+                    "flags": "Green",
+                    "streakCount": 4,
+                    "updatedAt": "2025-11-14T12:20:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Insights"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/insights/summary": {
+      "get": {
+        "operationId": "InsightsController_getSummary",
+        "summary": "Get dashboard-ready insight summary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Aggregated summary for dashboards (wins, focus, recs)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "momentumScore": 68.25,
+                    "flag": "Yellow",
+                    "streakCount": 3,
+                    "updatedAt": "2025-11-14T12:20:00.000Z",
+                    "recommendations": [
+                      "Schedule a quick daily review to boost consistency.",
+                      "Close at least one planned outcome this week to move momentum back to green."
+                    ],
+                    "recentWins": [
+                      {
+                        "id": "out_1",
+                        "title": "Publish investor update",
+                        "weekStartDate": "2025-11-10T00:00:00.000Z"
+                      }
+                    ],
+                    "focusAreas": [
+                      {
+                        "id": "act_1",
+                        "title": "Prep Q4 forecast",
+                        "category": "Finance",
+                        "dueDate": "2025-11-17T00:00:00.000Z"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Insights"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/insights/momentum": {
+      "get": {
+        "operationId": "InsightsController_getMomentum",
+        "summary": "Get focused momentum summary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Momentum-only KPIs for the most recent activity window",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "momentumScore": 74.5,
+                    "flag": "Green",
+                    "completionRate": 83.33,
+                    "completedOutcomes": 5,
+                    "totalOutcomes": 6,
+                    "activeDays": 5,
+                    "updatedAt": "2025-11-14T12:20:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Insights"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/insights/streak": {
+      "get": {
+        "operationId": "InsightsController_getStreak",
+        "summary": "Get streak health summary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Streak progress plus recommended actions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "streakCount": 4,
+                    "lastActiveDate": "2025-11-13T00:00:00.000Z",
+                    "progressToTarget": 57.14,
+                    "recommendations": [
+                      "Keep logging key metrics daily to preserve this streak.",
+                      "Plan one stretch outcome for next week to capitalize on current momentum."
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Insights"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/settings": {
+      "get": {
+        "operationId": "SettingsController_getSettings",
+        "summary": "Get user settings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Current tenant user settings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "timezone": "America/Los_Angeles",
+                    "notificationsEmail": true,
+                    "notificationsPush": false
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "SettingsController_updateSettings",
+        "summary": "Update personal settings",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated tenant user settings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "timezone": "America/Los_Angeles",
+                    "notificationsEmail": true,
+                    "notificationsPush": false
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/templates/metrics": {
+      "get": {
+        "operationId": "TemplatesController_getAllMetricTemplates",
+        "summary": "Get all metric templates",
+        "description": "Returns all global metric templates. Templates are managed by Superadmin.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Ordered list of metric templates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": [
+                    {
+                      "id": "metric_tmpl_123",
+                      "name": "Weekly Qualified Leads",
+                      "description": "Track qualified leads sourced per week",
+                      "unit": "count",
+                      "cadence": "weekly",
+                      "createdAt": "2025-11-15T12:00:00.000Z",
+                      "updatedAt": "2025-11-15T12:05:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Templates"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/templates/outcomes": {
+      "get": {
+        "operationId": "TemplatesController_getAllOutcomeTemplates",
+        "summary": "Get all outcome templates",
+        "description": "Returns all global outcome templates. Templates are managed by Superadmin.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Ordered list of outcome templates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": [
+                    {
+                      "id": "outcome_tmpl_456",
+                      "title": "Publish customer newsletter",
+                      "category": "Marketing",
+                      "expectedImpact": "Drive engagement",
+                      "createdAt": "2025-11-15T12:00:00.000Z",
+                      "updatedAt": "2025-11-15T12:05:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Templates"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/templates/activities": {
+      "get": {
+        "operationId": "TemplatesController_getAllActivityTemplates",
+        "summary": "Get all activity templates",
+        "description": "Returns all global activity templates. Templates are managed by Superadmin.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Ordered list of activity templates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": [
+                    {
+                      "id": "activity_tmpl_789",
+                      "title": "Follow up with inbound leads",
+                      "category": "Sales",
+                      "defaultOwnerRole": "MANAGER",
+                      "createdAt": "2025-11-15T12:00:00.000Z",
+                      "updatedAt": "2025-11-15T12:05:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Templates"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/support/tickets": {
+      "post": {
+        "operationId": "SupportController_createTicket",
+        "summary": "Create support ticket",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTicketDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Support ticket created"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Support"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "SupportController_getAllTickets",
+        "summary": "Get all tickets (Admin only)",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search query string",
+            "schema": {
+              "example": "revenue",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "description": "Sort field and direction (e.g., createdAt:desc, name:asc)",
+            "schema": {
+              "example": "createdAt:desc",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All tenant tickets"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Support"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/support/tickets/my": {
+      "get": {
+        "operationId": "SupportController_getMyTickets",
+        "summary": "Get my tickets",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search query string",
+            "schema": {
+              "example": "revenue",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "description": "Sort field and direction (e.g., createdAt:desc, name:asc)",
+            "schema": {
+              "example": "createdAt:desc",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tickets created by current user"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Support"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/support/tickets/{id}": {
+      "patch": {
+        "operationId": "SupportController_updateTicketStatus",
+        "summary": "Update ticket status (Admin only)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTicketDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated ticket"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Support"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "SupportController_deleteTicket",
+        "summary": "Delete ticket (Admin only)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ticket deleted"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Support"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/reports/generate": {
+      "post": {
+        "operationId": "ReportsController_generateReport",
+        "summary": "Generate PDF report (Weekly/Monthly)",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateReportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Report generation request accepted"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/performance/analytics": {
+      "get": {
+        "operationId": "PerformanceController_getAnalytics",
+        "summary": "Get performance analytics (top coaches, top/bottom SMEs)",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Performance analytics payload"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Performance"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/sessions/my": {
+      "get": {
+        "operationId": "SessionsController_getMySessions",
+        "summary": "Get my active sessions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Active refresh-token backed sessions for the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": [
+                    {
+                      "id": "sess_123",
+                      "ipAddress": "10.0.0.12",
+                      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_5_2)",
+                      "createdAt": "2025-11-15T12:00:00.000Z",
+                      "expiresAt": "2025-12-15T12:00:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Sessions"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/sessions/{id}": {
+      "delete": {
+        "operationId": "SessionsController_revokeSession",
+        "summary": "Revoke specific session (force logout)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Confirmation message and audit trail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Session revoked successfully"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Sessions"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/sessions/my/all": {
+      "delete": {
+        "operationId": "SessionsController_revokeAllMySessions",
+        "summary": "Revoke all my sessions except current",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Confirmation message and audit trail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "All sessions revoked successfully"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Sessions"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/ops/health": {
+      "get": {
+        "operationId": "OpsController_getHealth",
+        "summary": "Get system health status (public endpoint)",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Ops"
+        ],
+        "security": [
+          {
+            "ops-service": []
+          }
+        ]
+      }
+    },
+    "/api/v1/ops/environment": {
+      "get": {
+        "operationId": "OpsController_getEnvironment",
+        "summary": "Get runtime environment snapshot",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Ops"
+        ],
+        "security": [
+          {
+            "ops-service": []
+          }
+        ]
+      }
+    },
+    "/api/v1/ops/telemetry": {
+      "get": {
+        "operationId": "OpsController_getTelemetry",
+        "summary": "Get telemetry overview for background jobs",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelemetryOverviewDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Ops"
+        ],
+        "security": [
+          {
+            "ops-service": []
+          }
+        ]
+      }
+    },
+    "/api/v1/ops/insights-telemetry": {
+      "get": {
+        "operationId": "OpsController_getInsightsTelemetry",
+        "summary": "Get insights telemetry dashboard",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InsightsTelemetryDashboardDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Ops"
+        ],
+        "security": [
+          {
+            "ops-service": []
+          }
+        ]
+      }
+    },
+    "/api/v1/ops/rate-limits": {
+      "get": {
+        "operationId": "OpsController_getRateLimits",
+        "summary": "Get tenant-aware rate limit overview",
+        "parameters": [
+          {
+            "name": "windowMinutes",
+            "required": false,
+            "in": "query",
+            "description": "Rolling window length in minutes",
+            "schema": {
+              "default": 60,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitOverviewDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Ops"
+        ],
+        "security": [
+          {
+            "ops-service": []
+          }
+        ]
+      }
+    },
+    "/api/v1/ops/audit-logs": {
+      "get": {
+        "operationId": "OpsController_getAuditLogs",
+        "summary": "Get recent structured audit logs",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search query string",
+            "schema": {
+              "example": "revenue",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "description": "Sort field and direction (e.g., createdAt:desc, name:asc)",
+            "schema": {
+              "example": "createdAt:desc",
+              "type": "string"
+            }
+          },
+          {
+            "name": "tenantId",
+            "required": false,
+            "in": "query",
+            "description": "Filter logs to a specific tenant",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "module",
+            "required": false,
+            "in": "query",
+            "description": "Filter logs by module",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "required": false,
+            "in": "query",
+            "description": "Filter logs by action",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditLogResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Ops"
+        ],
+        "security": [
+          {
+            "ops-service": []
+          }
+        ]
+      }
+    },
+    "/api/v1/dashboard/summary": {
+      "get": {
+        "operationId": "DashboardController_getSummary",
+        "summary": "Get consolidated dashboard summary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Consolidated dashboard payload"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "tags": [
+          "Dashboard"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "BG Accountability Tenant API",
+    "description": "REST API for the BG Accountability Platform - Tenant Services.\n\n## Overview\nThis API serves both the Tenant Web Dashboard (Next.js) and Mobile App (Flutter).\n\n## Authentication\nAll protected endpoints require a valid JWT Bearer token.\n- Login via `POST /api/v1/auth/login`\n- Include token in header: `Authorization: Bearer <token>`\n- Refresh tokens via `POST /api/v1/auth/refresh`\n\n## Multi-Factor Authentication (MFA)\n- If MFA is enabled, login returns a `tempToken`\n- Complete MFA via `POST /api/v1/auth/mfa/login` with tempToken + TOTP code\n\n## Rate Limiting\n- Default: 100 requests per minute per IP\n- Auth endpoints: 10 requests per minute per IP\n\n## Error Format\nAll errors follow: `{ success: false, message: string, code?: string, details?: object }`\n\n## Pagination\nPaginated endpoints use: `{ items: T[], total: number, page: number, pageSize: number }`\n",
+    "version": "1.0.0",
+    "contact": {
+      "name": "BG Accountability",
+      "url": "https://bridgegaps.app",
+      "email": "support@bridgegaps.app"
+    },
+    "license": {
+      "name": "Proprietary",
+      "url": ""
+    }
+  },
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Authentication & MFA endpoints (public)"
+    },
+    {
+      "name": "User",
+      "description": "Tenant user management"
+    },
+    {
+      "name": "Dashboard",
+      "description": "Consolidated KPIs and telemetry"
+    },
+    {
+      "name": "Business",
+      "description": "Business snapshot & NSM configuration"
+    },
+    {
+      "name": "Metrics",
+      "description": "KPI tracking and logging"
+    },
+    {
+      "name": "Outcomes",
+      "description": "Weekly goal management"
+    },
+    {
+      "name": "Reviews",
+      "description": "Daily and weekly reflections"
+    },
+    {
+      "name": "Sales",
+      "description": "Sales planning and tracking"
+    },
+    {
+      "name": "Activities",
+      "description": "Task and activity management"
+    },
+    {
+      "name": "Insights",
+      "description": "Momentum scoring and analytics"
+    },
+    {
+      "name": "Settings",
+      "description": "User preferences"
+    },
+    {
+      "name": "Templates",
+      "description": "Metric templates"
+    },
+    {
+      "name": "Support",
+      "description": "Support ticket management"
+    },
+    {
+      "name": "Reports",
+      "description": "Report generation"
+    },
+    {
+      "name": "Performance",
+      "description": "Performance analytics"
+    },
+    {
+      "name": "Sessions",
+      "description": "Coaching sessions"
+    },
+    {
+      "name": "Ops",
+      "description": "Health and diagnostics"
+    }
+  ],
+  "servers": [
+    {
+      "url": "http://localhost:3002",
+      "description": "Local Development"
+    },
+    {
+      "url": "https://api.bridgegaps.app",
+      "description": "Production"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "JWT-auth": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http",
+        "description": "Enter your JWT access token"
+      }
+    },
+    "schemas": {
+      "RegisterDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "description": "Minimum 10 characters with uppercase, lowercase, number, and symbol"
+          },
+          "businessType": {
+            "type": "string",
+            "enum": [
+              "Solopreneur",
+              "Startup",
+              "MSME"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "password",
+          "businessType"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "mfaCode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "RefreshTokenDto": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "description": "Refresh token"
+          }
+        },
+        "required": [
+          "refreshToken"
+        ]
+      },
+      "MfaCodeDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "6-digit TOTP code"
+          }
+        },
+        "required": [
+          "code"
+        ]
+      },
+      "AcceptInviteDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "description": "Minimum 10 characters with uppercase, lowercase, number, and symbol"
+          }
+        },
+        "required": [
+          "token",
+          "password"
+        ]
+      },
+      "OnboardingStepFlags": {
+        "type": "object",
+        "properties": {
+          "profileCompleted": {
+            "type": "boolean",
+            "description": "Profile step completed",
+            "example": true
+          },
+          "businessIdentityCompleted": {
+            "type": "boolean",
+            "description": "Business identity step completed",
+            "example": false
+          },
+          "salesPlanCompleted": {
+            "type": "boolean",
+            "description": "Sales plan step completed",
+            "example": false
+          },
+          "activityConfigCompleted": {
+            "type": "boolean",
+            "description": "Activity configuration step completed",
+            "example": false
+          },
+          "salesCycleCompleted": {
+            "type": "boolean",
+            "description": "Sales cycle step completed",
+            "example": false
+          },
+          "achievementStagesCompleted": {
+            "type": "boolean",
+            "description": "Achievement stages step completed",
+            "example": false
+          },
+          "subscriptionCompleted": {
+            "type": "boolean",
+            "description": "Subscription step completed",
+            "example": false
+          },
+          "visualSetupCompleted": {
+            "type": "boolean",
+            "description": "Visual/finish step completed",
+            "example": false
+          }
+        },
+        "required": [
+          "profileCompleted",
+          "businessIdentityCompleted",
+          "salesPlanCompleted",
+          "activityConfigCompleted",
+          "salesCycleCompleted",
+          "achievementStagesCompleted",
+          "subscriptionCompleted",
+          "visualSetupCompleted"
+        ]
+      },
+      "OnboardingProgressResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier"
+          },
+          "tenantId": {
+            "type": "string",
+            "description": "Tenant ID"
+          },
+          "currentStep": {
+            "type": "number",
+            "description": "Current step number (1-based)",
+            "example": 1
+          },
+          "stepsCompleted": {
+            "description": "Array of completed step identifiers",
+            "example": [
+              "PROFILE",
+              "BUSINESS_IDENTITY"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isCompleted": {
+            "type": "boolean",
+            "description": "Whether onboarding is fully completed",
+            "example": false
+          },
+          "completedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when onboarding was completed",
+            "nullable": true
+          },
+          "stepFlags": {
+            "description": "Step completion flags",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OnboardingStepFlags"
+              }
+            ]
+          },
+          "selectedPlan": {
+            "type": "string",
+            "description": "Selected subscription plan (before activation)",
+            "enum": [
+              "FREE",
+              "STARTER",
+              "PROFESSIONAL",
+              "ENTERPRISE"
+            ]
+          },
+          "stepTitles": {
+            "type": "object",
+            "description": "Step number to title mapping for UI display",
+            "example": {
+              "1": "Profile Setup",
+              "2": "Business Identity",
+              "3": "Sales Planning",
+              "4": "Activity Setup",
+              "5": "Sales Cycle",
+              "6": "Achievement Stages",
+              "7": "Subscription",
+              "8": "Finish"
+            }
+          },
+          "totalSteps": {
+            "type": "number",
+            "description": "Total number of onboarding steps",
+            "example": 8
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Record creation timestamp"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Record last update timestamp"
+          }
+        },
+        "required": [
+          "id",
+          "tenantId",
+          "currentStep",
+          "stepsCompleted",
+          "isCompleted",
+          "stepFlags",
+          "stepTitles",
+          "totalSteps",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateOnboardingDto": {
+        "type": "object",
+        "properties": {
+          "currentStep": {
+            "type": "number",
+            "description": "Current step number in the onboarding flow (1-based)",
+            "example": 2,
+            "minimum": 1,
+            "maximum": 8
+          },
+          "completedStep": {
+            "type": "string",
+            "description": "Step identifier to mark as completed",
+            "example": "PROFILE",
+            "enum": [
+              "PROFILE",
+              "BUSINESS_IDENTITY",
+              "SALES_PLAN",
+              "ACTIVITY_CONFIG",
+              "SALES_CYCLE",
+              "ACHIEVEMENT_STAGES",
+              "SUBSCRIPTION",
+              "VISUAL_SETUP"
+            ]
+          },
+          "isCompleted": {
+            "type": "boolean",
+            "description": "Whether the entire onboarding flow is completed",
+            "example": false
+          }
+        }
+      },
+      "SocialHandlesDto": {
+        "type": "object",
+        "properties": {
+          "linkedin": {
+            "type": "string",
+            "example": "https://linkedin.com/in/johndoe"
+          },
+          "twitter": {
+            "type": "string",
+            "example": "https://twitter.com/johndoe"
+          },
+          "instagram": {
+            "type": "string",
+            "example": "https://instagram.com/johndoe"
+          },
+          "facebook": {
+            "type": "string",
+            "example": "https://facebook.com/johndoe"
+          },
+          "website": {
+            "type": "string",
+            "example": "https://mywebsite.com"
+          }
+        }
+      },
+      "UpdateProfileOnboardingDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Full name of the user",
+            "example": "John Doe"
+          },
+          "age": {
+            "type": "number",
+            "description": "Age of the user",
+            "example": 35
+          },
+          "gender": {
+            "type": "string",
+            "description": "Gender",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "OTHER",
+              "PREFER_NOT_TO_SAY"
+            ],
+            "example": "MALE"
+          },
+          "maritalStatus": {
+            "type": "string",
+            "description": "Marital status",
+            "enum": [
+              "SINGLE",
+              "MARRIED",
+              "DIVORCED",
+              "WIDOWED",
+              "PREFER_NOT_TO_SAY"
+            ],
+            "example": "MARRIED"
+          },
+          "businessType": {
+            "type": "string",
+            "description": "Business type",
+            "enum": [
+              "Solopreneur",
+              "Startup",
+              "MSME"
+            ],
+            "example": "Solopreneur"
+          },
+          "businessDescription": {
+            "type": "string",
+            "description": "Brief description of the business",
+            "example": "I run a digital marketing agency focused on small businesses.",
+            "maxLength": 500
+          },
+          "socialHandles": {
+            "description": "Social media handles and website",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SocialHandlesDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "businessType"
+        ]
+      },
+      "ProfileOnboardingResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "age": {
+            "type": "number"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "OTHER",
+              "PREFER_NOT_TO_SAY"
+            ]
+          },
+          "maritalStatus": {
+            "type": "string",
+            "enum": [
+              "SINGLE",
+              "MARRIED",
+              "DIVORCED",
+              "WIDOWED",
+              "PREFER_NOT_TO_SAY"
+            ]
+          },
+          "businessType": {
+            "type": "string",
+            "enum": [
+              "Solopreneur",
+              "Startup",
+              "MSME"
+            ]
+          },
+          "businessDescription": {
+            "type": "string"
+          },
+          "socialHandles": {
+            "$ref": "#/components/schemas/SocialHandlesDto"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "businessType",
+          "updatedAt"
+        ]
+      },
+      "BusinessIdentityResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "companyName": {
+            "type": "string"
+          },
+          "companyType": {
+            "type": "string",
+            "enum": [
+              "SOLE_PROPRIETORSHIP",
+              "PARTNERSHIP",
+              "LLC",
+              "CORPORATION",
+              "NON_PROFIT",
+              "COOPERATIVE",
+              "OTHER"
+            ]
+          },
+          "industry": {
+            "type": "string",
+            "enum": [
+              "TECHNOLOGY",
+              "HEALTHCARE",
+              "FINANCE",
+              "RETAIL",
+              "MANUFACTURING",
+              "EDUCATION",
+              "REAL_ESTATE",
+              "HOSPITALITY",
+              "CONSULTING",
+              "MARKETING",
+              "CONSTRUCTION",
+              "TRANSPORTATION",
+              "AGRICULTURE",
+              "ENTERTAINMENT",
+              "OTHER"
+            ]
+          },
+          "industryOther": {
+            "type": "string"
+          },
+          "foundedYear": {
+            "type": "number"
+          },
+          "turnoverBand": {
+            "type": "string",
+            "enum": [
+              "UNDER_1L",
+              "L1_TO_5L",
+              "L5_TO_10L",
+              "L10_TO_25L",
+              "L25_TO_50L",
+              "L50_TO_1CR",
+              "CR1_TO_5CR",
+              "CR5_TO_10CR",
+              "ABOVE_10CR"
+            ]
+          },
+          "employeeRange": {
+            "type": "string",
+            "enum": [
+              "SOLO",
+              "MICRO",
+              "SMALL",
+              "MEDIUM",
+              "LARGE",
+              "ENTERPRISE"
+            ]
+          },
+          "website": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "tenantId",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "BusinessIdentityDto": {
+        "type": "object",
+        "properties": {
+          "companyName": {
+            "type": "string",
+            "description": "Company/business name",
+            "example": "Acme Corp"
+          },
+          "companyType": {
+            "type": "string",
+            "description": "Type of company",
+            "enum": [
+              "SOLE_PROPRIETORSHIP",
+              "PARTNERSHIP",
+              "LLC",
+              "CORPORATION",
+              "NON_PROFIT",
+              "COOPERATIVE",
+              "OTHER"
+            ],
+            "example": "LLC"
+          },
+          "industry": {
+            "type": "string",
+            "description": "Industry sector",
+            "enum": [
+              "TECHNOLOGY",
+              "HEALTHCARE",
+              "FINANCE",
+              "RETAIL",
+              "MANUFACTURING",
+              "EDUCATION",
+              "REAL_ESTATE",
+              "HOSPITALITY",
+              "CONSULTING",
+              "MARKETING",
+              "CONSTRUCTION",
+              "TRANSPORTATION",
+              "AGRICULTURE",
+              "ENTERTAINMENT",
+              "OTHER"
+            ],
+            "example": "TECHNOLOGY"
+          },
+          "industryOther": {
+            "type": "string",
+            "description": "Custom industry description (when industry is OTHER)",
+            "example": "Space Tourism",
+            "maxLength": 100
+          },
+          "foundedYear": {
+            "type": "number",
+            "description": "Year the business was founded",
+            "example": 2018
+          },
+          "turnoverBand": {
+            "type": "string",
+            "description": "Annual turnover band",
+            "enum": [
+              "UNDER_1L",
+              "L1_TO_5L",
+              "L5_TO_10L",
+              "L10_TO_25L",
+              "L25_TO_50L",
+              "L50_TO_1CR",
+              "CR1_TO_5CR",
+              "CR5_TO_10CR",
+              "ABOVE_10CR"
+            ],
+            "example": "L10_TO_25L"
+          },
+          "employeeRange": {
+            "type": "string",
+            "description": "Number of employees range",
+            "enum": [
+              "SOLO",
+              "MICRO",
+              "SMALL",
+              "MEDIUM",
+              "LARGE",
+              "ENTERPRISE"
+            ],
+            "example": "SMALL"
+          },
+          "website": {
+            "type": "string",
+            "description": "Company website URL",
+            "example": "https://acme.com"
+          },
+          "description": {
+            "type": "string",
+            "description": "Brief description of the business",
+            "example": "We provide innovative software solutions for SMBs.",
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "industry"
+        ]
+      },
+      "SalesPlanResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "yearMinus3Value": {
+            "type": "number",
+            "example": 500000
+          },
+          "yearMinus2Value": {
+            "type": "number",
+            "example": 750000
+          },
+          "yearMinus1Value": {
+            "type": "number",
+            "example": 1000000
+          },
+          "projectedYearValue": {
+            "type": "number",
+            "example": 1500000
+          },
+          "monthlyContribution": {
+            "description": "Monthly contribution percentages",
+            "example": [
+              8,
+              7,
+              8,
+              9,
+              8,
+              7,
+              9,
+              10,
+              9,
+              8,
+              8,
+              9
+            ],
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "monthlyTargets": {
+            "description": "Calculated monthly targets based on projectedYearValue * monthlyContribution[i] / 100",
+            "example": [
+              120000,
+              105000,
+              120000,
+              135000,
+              120000,
+              105000,
+              135000,
+              150000,
+              135000,
+              120000,
+              120000,
+              135000
+            ],
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "tenantId",
+          "projectedYearValue",
+          "monthlyContribution",
+          "monthlyTargets",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "SalesPlanDto": {
+        "type": "object",
+        "properties": {
+          "yearMinus3Value": {
+            "type": "number",
+            "description": "Revenue from 3 years ago (null if business did not exist)",
+            "example": 500000
+          },
+          "yearMinus2Value": {
+            "type": "number",
+            "description": "Revenue from 2 years ago (null if business did not exist)",
+            "example": 750000
+          },
+          "yearMinus1Value": {
+            "type": "number",
+            "description": "Revenue from last year (null if business did not exist)",
+            "example": 1000000
+          },
+          "projectedYearValue": {
+            "type": "number",
+            "description": "Projected revenue target for the upcoming year",
+            "example": 1500000
+          },
+          "monthlyContribution": {
+            "description": "Monthly contribution percentages (12 values that must sum to ~100%)",
+            "example": [
+              8,
+              7,
+              8,
+              9,
+              8,
+              7,
+              9,
+              10,
+              9,
+              8,
+              8,
+              9
+            ],
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "required": [
+          "projectedYearValue",
+          "monthlyContribution"
+        ]
+      },
+      "ActivityConfigurationResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "salesEnabled": {
+            "type": "boolean"
+          },
+          "marketingEnabled": {
+            "type": "boolean"
+          },
+          "networkingEnabled": {
+            "type": "boolean"
+          },
+          "productDevEnabled": {
+            "type": "boolean"
+          },
+          "operationsEnabled": {
+            "type": "boolean"
+          },
+          "weeklyActivityGoal": {
+            "type": "number"
+          },
+          "enableReminders": {
+            "type": "boolean"
+          },
+          "reminderDays": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "tenantId",
+          "salesEnabled",
+          "marketingEnabled",
+          "networkingEnabled",
+          "productDevEnabled",
+          "operationsEnabled",
+          "weeklyActivityGoal",
+          "enableReminders",
+          "reminderDays",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ActivityConfigurationDto": {
+        "type": "object",
+        "properties": {
+          "salesEnabled": {
+            "type": "boolean",
+            "description": "Enable sales development activities tracking",
+            "example": true,
+            "default": true
+          },
+          "marketingEnabled": {
+            "type": "boolean",
+            "description": "Enable marketing activities tracking",
+            "example": true,
+            "default": true
+          },
+          "networkingEnabled": {
+            "type": "boolean",
+            "description": "Enable networking activities tracking",
+            "example": true,
+            "default": true
+          },
+          "productDevEnabled": {
+            "type": "boolean",
+            "description": "Enable product development activities tracking",
+            "example": false,
+            "default": true
+          },
+          "operationsEnabled": {
+            "type": "boolean",
+            "description": "Enable operations activities tracking",
+            "example": true,
+            "default": true
+          },
+          "weeklyActivityGoal": {
+            "type": "number",
+            "description": "Target number of activities per week",
+            "example": 5,
+            "default": 5
+          },
+          "enableReminders": {
+            "type": "boolean",
+            "description": "Enable reminder notifications",
+            "example": true,
+            "default": true
+          },
+          "reminderDays": {
+            "description": "Days of the week to send reminders (1=Mon, 7=Sun)",
+            "example": [
+              1,
+              3,
+              5
+            ],
+            "default": [
+              1,
+              3,
+              5
+            ],
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "SalesCycleStageResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "order": {
+            "type": "number"
+          },
+          "color": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "probability": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "tenantId",
+          "name",
+          "order",
+          "isActive",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "SalesCycleSetupResponseDto": {
+        "type": "object",
+        "properties": {
+          "stages": {
+            "description": "Array of created/updated sales cycle stages",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SalesCycleStageResponseDto"
+            }
+          },
+          "totalStages": {
+            "type": "number",
+            "description": "Total number of stages",
+            "example": 5
+          }
+        },
+        "required": [
+          "stages",
+          "totalStages"
+        ]
+      },
+      "SalesCycleStageDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Stage name",
+            "example": "Lead",
+            "maxLength": 50
+          },
+          "order": {
+            "type": "number",
+            "description": "Display order (1-based)",
+            "example": 1,
+            "minimum": 1
+          },
+          "color": {
+            "type": "string",
+            "description": "Hex color for UI display",
+            "example": "#3B82F6"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of this stage",
+            "example": "Initial contact with potential customer",
+            "maxLength": 200
+          },
+          "probability": {
+            "type": "number",
+            "description": "Probability of closing at this stage (0-100)",
+            "example": 10,
+            "minimum": 0,
+            "maximum": 100
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Whether this stage is active",
+            "example": true,
+            "default": true
+          }
+        },
+        "required": [
+          "name",
+          "order"
+        ]
+      },
+      "SalesCycleSetupDto": {
+        "type": "object",
+        "properties": {
+          "stages": {
+            "description": "Array of sales cycle stages (replaces all existing stages)",
+            "minItems": 2,
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SalesCycleStageDto"
+            }
+          }
+        },
+        "required": [
+          "stages"
+        ]
+      },
+      "AchievementStageResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "order": {
+            "type": "number"
+          },
+          "targetValue": {
+            "type": "number"
+          },
+          "percentOfGoal": {
+            "type": "number"
+          },
+          "color": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "reward": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "tenantId",
+          "name",
+          "order",
+          "targetValue",
+          "isActive",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "AchievementStagesSetupResponseDto": {
+        "type": "object",
+        "properties": {
+          "stages": {
+            "description": "Array of created/updated achievement stages",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AchievementStageResponseDto"
+            }
+          },
+          "totalStages": {
+            "type": "number",
+            "description": "Total number of stages",
+            "example": 4
+          }
+        },
+        "required": [
+          "stages",
+          "totalStages"
+        ]
+      },
+      "AchievementStageDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Stage name",
+            "example": "Bronze",
+            "maxLength": 50
+          },
+          "order": {
+            "type": "number",
+            "description": "Display order (1-based)",
+            "example": 1,
+            "minimum": 1
+          },
+          "targetValue": {
+            "type": "number",
+            "description": "Target value (revenue/sales) to reach this stage",
+            "example": 375000,
+            "minimum": 0
+          },
+          "percentOfGoal": {
+            "type": "number",
+            "description": "Percentage of annual goal (e.g., 25 for 25%)",
+            "example": 25,
+            "minimum": 0,
+            "maximum": 200
+          },
+          "color": {
+            "type": "string",
+            "description": "Hex color for UI display",
+            "example": "#CD7F32"
+          },
+          "icon": {
+            "type": "string",
+            "description": "Icon identifier (e.g., trophy, star, medal)",
+            "example": "medal",
+            "maxLength": 50
+          },
+          "reward": {
+            "type": "string",
+            "description": "Reward or celebration description",
+            "example": "Congratulations! You have reached your first milestone!",
+            "maxLength": 500
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Whether this stage is active",
+            "example": true,
+            "default": true
+          }
+        },
+        "required": [
+          "name",
+          "order",
+          "targetValue"
+        ]
+      },
+      "AchievementStagesSetupDto": {
+        "type": "object",
+        "properties": {
+          "stages": {
+            "description": "Array of achievement stages (replaces all existing stages)",
+            "minItems": 2,
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AchievementStageDto"
+            }
+          }
+        },
+        "required": [
+          "stages"
+        ]
+      },
+      "SubscriptionSelectionResponseDto": {
+        "type": "object",
+        "properties": {
+          "selectedPlan": {
+            "type": "string",
+            "description": "Selected plan stored in onboarding progress",
+            "enum": [
+              "FREE",
+              "STARTER",
+              "PROFESSIONAL",
+              "ENTERPRISE"
+            ]
+          },
+          "planFeatures": {
+            "type": "object",
+            "description": "Plan features description"
+          }
+        },
+        "required": [
+          "selectedPlan",
+          "planFeatures"
+        ]
+      },
+      "SubscriptionSelectionDto": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "string",
+            "description": "Selected subscription plan",
+            "enum": [
+              "FREE",
+              "STARTER",
+              "PROFESSIONAL",
+              "ENTERPRISE"
+            ],
+            "example": "STARTER"
+          }
+        },
+        "required": [
+          "plan"
+        ]
+      },
+      "UpdateProfileDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "businessType": {
+            "type": "string",
+            "enum": [
+              "Solopreneur",
+              "Startup",
+              "MSME"
+            ]
+          }
+        }
+      },
+      "InviteTenantUserDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "MANAGER",
+              "STAFF",
+              "VIEWER"
+            ]
+          },
+          "businessType": {
+            "type": "string",
+            "enum": [
+              "Solopreneur",
+              "Startup",
+              "MSME"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "role"
+        ]
+      },
+      "UpdateTenantUserRoleDto": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "TENANT_ADMIN",
+              "MANAGER",
+              "STAFF",
+              "VIEWER"
+            ]
+          }
+        },
+        "required": [
+          "role"
+        ]
+      },
+      "UpdateTenantUserStatusDto": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "isActive"
+        ]
+      },
+      "SnapshotDto": {
+        "type": "object",
+        "properties": {
+          "annualSales": {
+            "type": "number"
+          },
+          "avgMonthlySales": {
+            "type": "number"
+          },
+          "ordersPerMonth": {
+            "type": "number"
+          },
+          "avgSellingPrice": {
+            "type": "number"
+          },
+          "monthlyExpenses": {
+            "type": "number"
+          },
+          "profitMargin": {
+            "type": "number"
+          }
+        }
+      },
+      "CreateMetricDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "target": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "CreateMetricLogDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "number"
+          },
+          "date": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      },
+      "UpdateMetricDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "target": {
+            "type": "number"
+          }
+        }
+      },
+      "CreateOutcomeDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Planned",
+              "Done",
+              "Missed"
+            ]
+          },
+          "weekStartDate": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "status",
+          "weekStartDate"
+        ]
+      },
+      "UpdateOutcomeDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Planned",
+              "Done",
+              "Missed"
+            ]
+          }
+        }
+      },
+      "CreateReviewDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "Daily",
+              "Weekly"
+            ]
+          },
+          "mood": {
+            "type": "number"
+          },
+          "content": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "UpsertSalesPlanningDto": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "number"
+          },
+          "q1": {
+            "type": "number"
+          },
+          "q2": {
+            "type": "number"
+          },
+          "q3": {
+            "type": "number"
+          },
+          "q4": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "year"
+        ]
+      },
+      "UpsertSalesTrackerDto": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string"
+          },
+          "target": {
+            "type": "number"
+          },
+          "achieved": {
+            "type": "number"
+          },
+          "mtd": {
+            "type": "number"
+          },
+          "ytd": {
+            "type": "number"
+          },
+          "orders": {
+            "type": "number"
+          },
+          "asp": {
+            "type": "number"
+          },
+          "expenses": {
+            "type": "number"
+          },
+          "profit": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "month"
+        ]
+      },
+      "CreateActivityDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string"
+          },
+          "dueDate": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "default": "Active"
+          }
+        },
+        "required": [
+          "title",
+          "category"
+        ]
+      },
+      "UpdateActivityDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string"
+          },
+          "dueDate": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateSettingsDto": {
+        "type": "object",
+        "properties": {
+          "timezone": {
+            "type": "string",
+            "description": "Preferred timezone (IANA name)",
+            "example": "America/New_York"
+          },
+          "notificationsEmail": {
+            "type": "boolean",
+            "description": "Opt-in for email notifications",
+            "default": true
+          },
+          "notificationsPush": {
+            "type": "boolean",
+            "description": "Opt-in for push notifications",
+            "default": true
+          }
+        }
+      },
+      "CreateTicketDto": {
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string",
+            "description": "Brief subject line for the ticket",
+            "minLength": 5,
+            "maxLength": 120,
+            "example": "Unable to access dashboard metrics"
+          },
+          "message": {
+            "type": "string",
+            "description": "Detailed description of the issue",
+            "minLength": 10,
+            "maxLength": 2000,
+            "example": "When I try to load the metrics page, it shows a blank screen. This started happening after the latest update."
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH"
+            ],
+            "default": "MEDIUM",
+            "description": "Ticket priority level"
+          }
+        },
+        "required": [
+          "subject",
+          "message"
+        ]
+      },
+      "UpdateTicketDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "IN_PROGRESS",
+              "RESOLVED",
+              "CLOSED"
+            ]
+          },
+          "adminNote": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "GenerateReportDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "WEEKLY",
+              "MONTHLY"
+            ]
+          },
+          "targetUserId": {
+            "type": "string",
+            "description": "Target user ID (defaults to current user)"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "TelemetryTotalsDto": {
+        "type": "object",
+        "properties": {
+          "successCount": {
+            "type": "number"
+          },
+          "failureCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "successCount",
+          "failureCount"
+        ]
+      },
+      "JobTelemetryDto": {
+        "type": "object",
+        "properties": {
+          "job": {
+            "type": "string"
+          },
+          "successCount": {
+            "type": "number"
+          },
+          "failureCount": {
+            "type": "number"
+          },
+          "lastSuccessAt": {
+            "type": "string"
+          },
+          "lastFailureAt": {
+            "type": "string"
+          },
+          "lastMetadata": {
+            "type": "object"
+          },
+          "lastError": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "job",
+          "successCount",
+          "failureCount"
+        ]
+      },
+      "TelemetryOverviewDto": {
+        "type": "object",
+        "properties": {
+          "totals": {
+            "$ref": "#/components/schemas/TelemetryTotalsDto"
+          },
+          "jobs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JobTelemetryDto"
+            }
+          }
+        },
+        "required": [
+          "totals",
+          "jobs"
+        ]
+      },
+      "InsightsSummaryDto": {
+        "type": "object",
+        "properties": {
+          "totalInsights": {
+            "type": "number"
+          },
+          "avgMomentum": {
+            "type": "number"
+          },
+          "lastRefreshAt": {
+            "type": "string"
+          },
+          "lastTelemetryError": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "totalInsights",
+          "avgMomentum"
+        ]
+      },
+      "FlagDistributionDto": {
+        "type": "object",
+        "properties": {
+          "flag": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "flag",
+          "count"
+        ]
+      },
+      "TopTenantMomentumDto": {
+        "type": "object",
+        "properties": {
+          "tenantId": {
+            "type": "string"
+          },
+          "tenantName": {
+            "type": "string"
+          },
+          "avgMomentum": {
+            "type": "number"
+          },
+          "usersTracked": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "tenantName",
+          "avgMomentum",
+          "usersTracked"
+        ]
+      },
+      "InsightsTelemetryDashboardDto": {
+        "type": "object",
+        "properties": {
+          "summary": {
+            "$ref": "#/components/schemas/InsightsSummaryDto"
+          },
+          "flagDistribution": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FlagDistributionDto"
+            }
+          },
+          "topTenants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TopTenantMomentumDto"
+            }
+          },
+          "telemetry": {
+            "$ref": "#/components/schemas/JobTelemetryDto"
+          }
+        },
+        "required": [
+          "summary",
+          "flagDistribution",
+          "topTenants"
+        ]
+      },
+      "RateLimitConfigDto": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "number"
+          },
+          "ttlMs": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "limit",
+          "ttlMs"
+        ]
+      },
+      "RateLimitWindowDto": {
+        "type": "object",
+        "properties": {
+          "minutes": {
+            "type": "number"
+          },
+          "since": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "minutes",
+          "since"
+        ]
+      },
+      "RateLimitTenantDto": {
+        "type": "object",
+        "properties": {
+          "tenantId": {
+            "type": "string"
+          },
+          "tenantName": {
+            "type": "string"
+          },
+          "requests": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "tenantName",
+          "requests"
+        ]
+      },
+      "RateLimitModuleDto": {
+        "type": "object",
+        "properties": {
+          "module": {
+            "type": "string"
+          },
+          "requests": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "module",
+          "requests"
+        ]
+      },
+      "RateLimitOverviewDto": {
+        "type": "object",
+        "properties": {
+          "config": {
+            "$ref": "#/components/schemas/RateLimitConfigDto"
+          },
+          "window": {
+            "$ref": "#/components/schemas/RateLimitWindowDto"
+          },
+          "topTenants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RateLimitTenantDto"
+            }
+          },
+          "moduleHotspots": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RateLimitModuleDto"
+            }
+          }
+        },
+        "required": [
+          "config",
+          "window",
+          "topTenants",
+          "moduleHotspots"
+        ]
+      },
+      "AuditLogEntryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "module": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "statusCode": {
+            "type": "number"
+          },
+          "responseTime": {
+            "type": "number"
+          },
+          "ipAddress": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "module",
+          "action",
+          "createdAt"
+        ]
+      },
+      "PaginationMetaDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          },
+          "hasNextPage": {
+            "type": "boolean"
+          },
+          "hasPreviousPage": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "page",
+          "pageSize",
+          "total",
+          "totalPages",
+          "hasNextPage",
+          "hasPreviousPage"
+        ]
+      },
+      "AuditLogResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuditLogEntryDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      }
+    }
+  }
+}

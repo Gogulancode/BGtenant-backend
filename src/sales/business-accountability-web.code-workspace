@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../superadmin-app"
+		},
+		{
+			"path": "../../../bridge-gaps-dashboard-main"
+		},
+		{
+			"path": "../../../superadmin-backend"
+		}
+	],
+	"settings": {}
+}

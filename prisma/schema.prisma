@@ -1,0 +1,790 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BusinessType {
+  Solopreneur
+  Startup
+  MSME
+}
+
+enum TenantType {
+  COMPANY
+  FREELANCER
+}
+
+enum SubscriptionPlan {
+  FREE
+  STARTER
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  TRIAL
+  EXPIRED
+  CANCELLED
+}
+
+enum OutcomeStatus {
+  Planned
+  Done
+  Missed
+}
+
+enum ReviewType {
+  Daily
+  Weekly
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum Role {
+  SUPER_ADMIN     // Platform superadmin (no tenant, manages all)
+  TENANT_ADMIN    // Owner of a tenant (company/freelancer)
+  MANAGER         // Manager within a tenant
+  STAFF           // Regular team member within a tenant
+  VIEWER          // Read-only user within a tenant
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum MaritalStatus {
+  SINGLE
+  MARRIED
+  DIVORCED
+  WIDOWED
+  PREFER_NOT_TO_SAY
+}
+
+enum CompanyType {
+  SOLE_PROPRIETORSHIP
+  PARTNERSHIP
+  LLC
+  CORPORATION
+  NON_PROFIT
+  COOPERATIVE
+  OTHER
+}
+
+enum Industry {
+  TECHNOLOGY
+  HEALTHCARE
+  FINANCE
+  RETAIL
+  MANUFACTURING
+  EDUCATION
+  REAL_ESTATE
+  HOSPITALITY
+  CONSULTING
+  MARKETING
+  CONSTRUCTION
+  TRANSPORTATION
+  AGRICULTURE
+  ENTERTAINMENT
+  OTHER
+}
+
+enum TurnoverBand {
+  UNDER_1L        // Under 1 Lakh
+  L1_TO_5L        // 1-5 Lakhs
+  L5_TO_10L       // 5-10 Lakhs
+  L10_TO_25L      // 10-25 Lakhs
+  L25_TO_50L      // 25-50 Lakhs
+  L50_TO_1CR      // 50L - 1 Crore
+  CR1_TO_5CR      // 1-5 Crores
+  CR5_TO_10CR     // 5-10 Crores
+  ABOVE_10CR      // Above 10 Crores
+}
+
+enum EmployeeRange {
+  SOLO            // 1 person
+  MICRO           // 2-5
+  SMALL           // 6-20
+  MEDIUM          // 21-50
+  LARGE           // 51-200
+  ENTERPRISE      // 200+
+}
+
+enum CustomerType {
+  B2B
+  B2C
+  BOTH
+}
+
+enum BusinessRegistrationStatus {
+  REGISTERED
+  UNREGISTERED
+  IN_PROGRESS
+}
+
+enum OfferingType {
+  PRODUCT
+  SERVICE
+  BOTH
+}
+
+enum SalesProspectStatus {
+  COLD
+  WARM
+  HOT
+  CONVERTED
+  REJECTED
+}
+
+enum SalesProspectReason {
+  BUDGET
+  AUTHORITY
+  NEED
+  TIMELINE
+  AVAILABILITY
+  CLOSURE
+  OTHER
+}
+
+// ============================================
+// TENANT MODEL - Multi-tenant SaaS
+// ============================================
+model Tenant {
+  id           String   @id @default(cuid())
+  name         String
+  type         TenantType
+  slug         String   @unique
+  email        String?  // Contact email for tenant
+  domain       String?  // Custom domain if any
+  status       String   @default("active") // active, suspended, cancelled
+  isActive     Boolean  @default(true)
+  isOnboarded  Boolean  @default(false)
+  onboardingStep Int    @default(1)
+  onboardingCompletedAt DateTime?
+  lastActiveAt DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  users            User[]
+  subscriptions    Subscription[]
+  businessSnapshots BusinessSnapshot[]
+  metrics          Metric[]
+  outcomes         Outcome[]
+  reviews          Review[]
+  salesPlannings   SalesPlanning[]
+  salesTrackers    SalesTracker[]
+  salesProspects   SalesProspect[]
+  weeklySalesEntries WeeklySalesEntry[]
+  activities       Activity[]
+  insights         Insight[]
+  tickets          Ticket[]
+  invitations      Invitation[]
+  onboardingProgress OnboardingProgress?
+  
+  // Onboarding-specific relations
+  businessIdentity      BusinessIdentity?
+  salesPlan             SalesPlan?
+  activityConfiguration ActivityConfiguration?
+  salesCycleStages      SalesCycleStage[]
+  achievementStages     AchievementStage[]
+  businessSetupChecklist BusinessSetupChecklist?
+
+  @@index([slug])
+  @@index([isActive])
+}
+
+// ============================================
+// SUBSCRIPTION MODEL - SaaS Billing
+// ============================================
+model Subscription {
+  id              String             @id @default(cuid())
+  tenantId        String
+  plan            SubscriptionPlan   @default(FREE)
+  status          SubscriptionStatus @default(TRIAL)
+  startDate       DateTime           @default(now())
+  endDate         DateTime?
+  trialEndsAt     DateTime?
+  maxUsers        Int                @default(5)
+  maxMetrics      Int                @default(10)
+  maxActivities   Int                @default(50)
+  billingEmail    String?
+  stripeCustomerId String?           @unique
+  stripeSubscriptionId String?       @unique
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  tenant          Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, status])
+}
+
+// ============================================
+// USER MODEL - Multi-tenant aware
+// ============================================
+model User {
+  id             String            @id @default(cuid())
+  name           String
+  email          String            @unique
+  passwordHash   String
+  businessType   BusinessType      @default(Solopreneur)
+  role           Role              @default(STAFF)
+  timezone       String            @default("UTC")
+  notificationsEmail Boolean       @default(true)
+  notificationsPush  Boolean       @default(true)
+  
+  // Profile fields (onboarding step 1)
+  age            Int?
+  gender         Gender?
+  maritalStatus  MaritalStatus?
+  businessDescription String?
+  socialHandles  Json?             // { linkedin?, twitter?, instagram?, facebook?, website? }
+  painPoints     Json?             // { gettingCustomers?, pricing?, negotiating?, referrals?, retaining?, executingPlans? }
+  
+  // Multi-tenant fields
+  tenantId       String?
+  tenant         Tenant?           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  isActive       Boolean           @default(true)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  passwordUpdatedAt DateTime?      @default(now())
+  mfaEnabled     Boolean           @default(false)
+  mfaSecret      String?
+
+  // Relations (all scoped to a single tenant)
+  businessSnapshot BusinessSnapshot?
+  metrics          Metric[]
+  outcomes         Outcome[]
+  reviews          Review[]
+  salesPlanning    SalesPlanning[]
+  salesTracker     SalesTracker[]
+  salesProspects   SalesProspect[]
+  weeklySalesEntries WeeklySalesEntry[]
+  activities       Activity[]
+  insight          Insight?
+  refreshTokens    RefreshToken[]
+  invitationsSent  Invitation[]    @relation("InvitationInviter")
+  invitation       Invitation?     @relation("InvitationUser")
+  tickets          Ticket[]
+  preference       UserPreference?
+
+  @@index([tenantId, isActive])
+  @@index([email])
+  @@index([role])
+}
+
+model UserPreference {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  timezone           String   @default("UTC")
+  notificationsEmail Boolean  @default(true)
+  notificationsPush  Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RefreshToken {
+  id              String   @id @default(cuid())
+  userId          String
+  token           String   @unique
+  revoked         Boolean  @default(false)
+  replacedByToken String?
+  ipAddress       String?
+  userAgent       String?
+  createdAt       DateTime @default(now())
+  expiresAt       DateTime
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revoked, expiresAt])
+  @@index([token])
+}
+
+model BusinessSnapshot {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  tenantId        String
+  annualSales     Float?
+  avgMonthlySales Float?
+  ordersPerMonth  Int?
+  avgSellingPrice Float?
+  monthlyExpenses Float?
+  profitMargin    Float?
+  suggestedNSM    String?
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+}
+
+model Metric {
+  id         String      @id @default(cuid())
+  userId     String
+  tenantId   String
+  name       String
+  target     Float?
+  createdAt  DateTime    @default(now())
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  logs       MetricLog[]
+
+  @@index([tenantId, userId])
+}
+
+model MetricLog {
+  id        String   @id @default(cuid())
+  metricId  String
+  value     Float
+  date      DateTime @default(now())
+  metric    Metric   @relation(fields: [metricId], references: [id], onDelete: Cascade)
+
+  @@index([metricId, date])
+}
+
+model Outcome {
+  id            String        @id @default(cuid())
+  userId        String
+  tenantId      String
+  title         String
+  status        OutcomeStatus @default(Planned)
+  weekStartDate DateTime
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant        Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, userId, weekStartDate])
+  @@index([tenantId, status])
+}
+
+model Review {
+  id        String     @id @default(cuid())
+  userId    String
+  tenantId  String
+  type      ReviewType
+  mood      Int?
+  content   String?
+  wins      String?
+  challenges String?
+  lessons   String?
+  date      DateTime   @default(now())
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, userId, type])
+}
+
+model SalesPlanning {
+  id        String   @id @default(cuid())
+  userId    String
+  tenantId  String
+  year      Int
+  q1        Float?
+  q2        Float?
+  q3        Float?
+  q4        Float?
+  growthPct Float?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId, year])
+  @@index([tenantId, year])
+}
+
+model SalesTracker {
+  id        String   @id @default(cuid())
+  userId    String
+  tenantId  String
+  month     String   // "2025-10"
+  target    Float?
+  achieved  Float?
+  mtd       Float?
+  ytd       Float?
+  orders    Int?
+  asp       Float?
+  expenses  Float?
+  profit    Float?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId, month])
+  @@index([tenantId, month])
+  @@index([userId, month])
+}
+
+// Weekly Sales Entry - For tracking actual sales achieved each week
+model WeeklySalesEntry {
+  id          String   @id @default(cuid())
+  userId      String
+  tenantId    String
+  year        Int
+  week        Int      // 1-52
+  achieved    Float    // Amount achieved this week
+  orders      Int?     // Number of orders/deals closed
+  notes       String?  // Optional notes
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId, year, week])
+  @@index([tenantId, year, week])
+  @@index([userId, year])
+}
+
+model SalesProspect {
+  id                String               @id @default(cuid())
+  userId            String
+  tenantId          String
+  month             String
+  firstCallAt       DateTime?
+  prospectName      String
+  mobileNumber      String?
+  offeringType      String?
+  proposalValue     Float?
+  referralSource    String?
+  lastFollowUpAt    DateTime?
+  status            SalesProspectStatus  @default(COLD)
+  reason            SalesProspectReason?
+  remarks           String?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, userId, month])
+  @@index([tenantId, status])
+  @@index([tenantId, lastFollowUpAt])
+}
+
+model Activity {
+  id         String   @id @default(cuid())
+  userId     String
+  tenantId   String
+  title      String
+  description String?
+  category   String   // Sales, Marketing, Product, Operations, Other
+  priority   String?  // High, Medium, Low
+  status     String   @default("Active") // Active, Completed
+  dueDate    DateTime?
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, userId, status])
+  @@index([tenantId, createdAt])
+}
+
+model Insight {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  tenantId       String
+  momentumScore  Float?   @default(0)
+  flags          String?  // Green / Yellow / Red
+  streakCount    Int?     @default(0)
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+}
+
+// ============================================
+// ACTION LOG - Enhanced for multi-tenant
+// ============================================
+model ActionLog {
+  id           String   @id @default(cuid())
+  userId       String?
+  tenantId     String?  // Track which tenant the action belongs to
+  module       String
+  action       String
+  method       String?  // GET, POST, PUT, DELETE
+  endpoint     String?
+  path         String?
+  targetId     String?
+  statusCode   Int?
+  responseTime Int?     // in ms
+  ipAddress    String?
+  userAgent    String?
+  details      Json?
+  createdAt    DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([tenantId, createdAt])
+  @@index([module, action])
+}
+
+model MetricTemplate {
+  id          String  @id @default(cuid())
+  name        String
+  targetValue Float?
+  frequency   String?
+  createdAt   DateTime @default(now())
+}
+
+model OutcomeTemplate {
+  id          String  @id @default(cuid())
+  title       String
+  description String?
+  createdAt   DateTime @default(now())
+}
+
+model ActivityTemplate {
+  id        String  @id @default(cuid())
+  name      String
+  category  String?
+  frequency String?
+  createdAt DateTime @default(now())
+}
+
+model Ticket {
+  id        String         @id @default(cuid())
+  userId    String
+  tenantId  String
+  subject   String
+  message   String
+  priority  TicketPriority @default(MEDIUM)
+  status    String         @default("OPEN")
+  adminNote String?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, status])
+  @@index([userId])
+}
+
+model Invitation {
+  id          String   @id @default(cuid())
+  tenantId    String
+  inviterId   String
+  userId      String   @unique
+  email       String
+  role        Role
+  tokenHash   String   @unique
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  inviter  User   @relation("InvitationInviter", fields: [inviterId], references: [id], onDelete: Cascade)
+  user     User   @relation("InvitationUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, expiresAt])
+}
+
+// ============================================
+// BUSINESS IDENTITY - Company/business details (Onboarding Step 2)
+// ============================================
+model BusinessIdentity {
+  id              String        @id @default(cuid())
+  tenantId        String        @unique
+  companyName     String?
+  companyType     CompanyType?
+  customerType    CustomerType?
+  registrationStatus BusinessRegistrationStatus?
+  offeringType    OfferingType?
+  industry        Industry?
+  industryOther   String?       // Custom industry if Industry.OTHER
+  foundedYear     Int?
+  businessAge     Int?          // Years in business
+  turnoverBand    TurnoverBand?
+  employeeRange   EmployeeRange?
+  website         String?
+  description     String?
+  usp             String?       // Unique Selling Proposition
+  keywords        String[]      // Business keywords/tags
+  offerings       Json?         // Product/service catalog, stored as string array
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// SALES PLAN - 3-year trend + projection (Onboarding Step 3)
+// ============================================
+model SalesPlan {
+  id                    String   @id @default(cuid())
+  tenantId              String   @unique
+  
+  // Past 3 years (can be null if business is new)
+  yearMinus3Value       Float?   // Revenue 3 years ago
+  yearMinus2Value       Float?   // Revenue 2 years ago
+  yearMinus1Value       Float?   // Revenue last year (most recent)
+  
+  // Projected year
+  projectedYearValue    Float    // Target revenue for upcoming year
+  
+  // Monthly contribution percentages (must sum to ~100%)
+  monthlyContribution   Float[]  // Array of 12 floats, each is a percentage
+  
+  // Calculated monthly targets (projectedYearValue * monthlyContribution[i] / 100)
+  monthlyTargets        Float[]  // Array of 12 calculated values
+
+  // Calculator assumptions and derived outputs
+  averageTicketSize     Float?   // Average sale / average transaction size
+  conversionRatio       Float?   // Percentage of leads that convert to orders
+  existingCustomerContribution Float? // Percentage of annual target from existing customers
+  newCustomerContribution Float? // Percentage of annual target from new customers
+  monthlyOrderTargets   Float[]  @default([])
+  monthlyLeadTargets    Float[]  @default([])
+  existingCustomerTarget Float?
+  newCustomerTarget     Float?
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// ACTIVITY CONFIGURATION - Development activities setup (Onboarding Step 4)
+// ============================================
+model ActivityConfiguration {
+  id              String   @id @default(cuid())
+  tenantId        String   @unique
+  
+  // Business development activities (toggle on/off)
+  salesEnabled    Boolean  @default(true)
+  marketingEnabled Boolean @default(true)
+  networkingEnabled Boolean @default(true)
+  productDevEnabled Boolean @default(true)
+  operationsEnabled Boolean @default(true)
+  
+  // Tracking preferences
+  weeklyActivityGoal Int?   @default(5)  // Target activities per week
+  enableReminders    Boolean @default(true)
+  reminderDays       Int[]   @default([1, 3, 5]) // 1=Mon, 3=Wed, 5=Fri
+  activities          Json?   // Selected activity templates with measurability/impact metadata
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// SALES CYCLE STAGES - Custom sales pipeline (Onboarding Step 5)
+// ============================================
+model SalesCycleStage {
+  id              String   @id @default(cuid())
+  tenantId        String
+  
+  name            String   // e.g., "Lead", "Qualified", "Proposal", "Negotiation", "Closed"
+  order           Int      // Display order (1, 2, 3...)
+  color           String?  // Hex color for UI
+  description     String?
+  
+  // Probability of closing at this stage (0-100)
+  probability     Int?     @default(0)
+  
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, order])
+  @@index([tenantId, isActive])
+}
+
+// ============================================
+// ACHIEVEMENT STAGES - Target milestones (Onboarding Step 6)
+// ============================================
+model AchievementStage {
+  id              String   @id @default(cuid())
+  tenantId        String
+  
+  name            String   // e.g., "Bronze", "Silver", "Gold", "Platinum"
+  order           Int      // Display order
+  targetValue     Float    // Revenue/sales target to reach this stage
+  percentOfGoal   Float?   // Percentage of annual goal (e.g., 25%, 50%, 75%, 100%)
+  color           String?  // Hex color for UI
+  icon            String?  // Icon identifier
+  reward          String?  // Reward description/celebration text
+  
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, order])
+  @@index([tenantId, isActive])
+}
+
+// ============================================
+// ONBOARDING PROGRESS - Track tenant onboarding state
+// ============================================
+model OnboardingProgress {
+  id              String    @id @default(cuid())
+  tenantId        String    @unique
+  currentStep     Int       @default(1)
+  stepsCompleted  String[]  @default([])
+  isCompleted     Boolean   @default(false)
+  completedAt     DateTime?
+  
+  // Step completion flags
+  profileCompleted          Boolean @default(false)
+  businessIdentityCompleted Boolean @default(false)
+  salesPlanCompleted        Boolean @default(false)
+  activityConfigCompleted   Boolean @default(false)
+  salesCycleCompleted       Boolean @default(false)
+  achievementStagesCompleted Boolean @default(false)
+  subscriptionCompleted     Boolean @default(false)
+  visualSetupCompleted      Boolean @default(false)
+  
+  // Selected subscription (before actual subscription creation)
+  selectedPlan    SubscriptionPlan?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// BUSINESS SETUP CHECKLIST - Track business foundation setup
+// ============================================
+model BusinessSetupChecklist {
+  id              String    @id @default(cuid())
+  tenantId        String    @unique
+  
+  // Step 0.1 - Define USP
+  uspDefined      Boolean   @default(false)
+  uspValue        String?
+  
+  // Step 0.2 - Define Menu Card (product/service offerings)
+  menuCardDefined Boolean   @default(false)
+  menuCardValue   String?   // Can be a description or JSON
+  
+  // Step 0.3 - Define Packages/Combo offers
+  packagesDefined Boolean   @default(false)
+  packagesValue   String?   // Can be a description or JSON
+  
+  // Step 0.4 - Define Customer Segment
+  customerSegmentDefined Boolean @default(false)
+  customerSegmentValue   String? // Target customer description
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}

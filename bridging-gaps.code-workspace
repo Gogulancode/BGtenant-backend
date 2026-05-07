@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "../bridge-gaps-dashboard-main"
+		},
+		{
+			"path": "."
+		},
+		{
+			"path": "../superadmin-app"
+		},
+		{
+			"path": "../superadmin-backend"
+		}
+	],
+	"settings": {
+		"powershell.cwd": "BGAccountabiityapp"
+	}
+}
