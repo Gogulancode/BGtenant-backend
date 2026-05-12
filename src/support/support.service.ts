@@ -6,7 +6,11 @@ import {
 import { Role } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { ActionLogService } from "../action-log/action-log.service";
-import { CreateTicketDto, UpdateTicketDto } from "./dto/ticket.dto";
+import {
+  AddTicketCommentDto,
+  CreateTicketDto,
+  UpdateTicketDto,
+} from "./dto/ticket.dto";
 import { assertTenantContext } from "../common/utils/tenant.utils";
 import {
   PaginationDto,
@@ -134,6 +138,72 @@ export class SupportService {
     }
 
     return tickets;
+  }
+
+  async getTicket(id: string, user: CurrentUserLike) {
+    const ticket = await this.findScopedTicket(id, user);
+    return this.prisma.ticket.findUnique({
+      where: { id: ticket.id },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
+        comments: {
+          orderBy: { createdAt: "asc" },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async addTicketComment(
+    id: string,
+    user: CurrentUserLike,
+    dto: AddTicketCommentDto,
+  ) {
+    const ticket = await this.findScopedTicket(id, user);
+    const scopedTenantId = assertTenantContext(user.tenantId);
+
+    const comment = await this.prisma.ticketComment.create({
+      data: {
+        ticketId: ticket.id,
+        userId: user.userId,
+        tenantId: scopedTenantId,
+        message: dto.message,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    await this.actionLog.record(
+      user.userId,
+      scopedTenantId,
+      "ADD_TICKET_COMMENT",
+      "support",
+      { ticketId: ticket.id, commentId: comment.id },
+    );
+
+    return comment;
   }
 
   async updateTicketStatus(

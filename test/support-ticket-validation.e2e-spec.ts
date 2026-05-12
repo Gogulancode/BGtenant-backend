@@ -28,8 +28,10 @@ describe("Support Ticket Validation (e2e)", () => {
     createTicket: jest.Mock;
     getAllTickets: jest.Mock;
     getMyTickets: jest.Mock;
+    getTicket: jest.Mock;
     updateTicketStatus: jest.Mock;
     deleteTicket: jest.Mock;
+    addTicketComment: jest.Mock;
   };
   let activeUser: ActiveUser;
 
@@ -50,8 +52,24 @@ describe("Support Ticket Validation (e2e)", () => {
       }),
       getAllTickets: jest.fn().mockResolvedValue([]),
       getMyTickets: jest.fn().mockResolvedValue([]),
+      getTicket: jest.fn().mockResolvedValue({
+        id: "ticket-1",
+        subject: "Valid subject here",
+        message: "This is a valid message with enough content.",
+        priority: TicketPriority.MEDIUM,
+        status: "OPEN",
+        comments: [],
+      }),
       updateTicketStatus: jest.fn().mockResolvedValue({ id: "ticket-1" }),
       deleteTicket: jest.fn().mockResolvedValue({ message: "Ticket deleted" }),
+      addTicketComment: jest.fn().mockResolvedValue({
+        id: "comment-1",
+        ticketId: "ticket-1",
+        message: "Thanks, I can reproduce this issue now.",
+        userId: activeUser.userId,
+        userName: "Test User",
+        createdAt: new Date().toISOString(),
+      }),
     };
 
     const moduleBuilder = Test.createTestingModule({
@@ -375,6 +393,58 @@ describe("Support Ticket Validation (e2e)", () => {
         .expect(200);
 
       expect(supportService.updateTicketStatus).toHaveBeenCalled();
+    });
+  });
+
+  describe("GET /support/tickets/:id - ticket detail", () => {
+    it("returns a tenant-scoped support ticket detail", async () => {
+      await request(app.getHttpServer())
+        .get("/support/tickets/ticket-1")
+        .expect(200);
+
+      expect(supportService.getTicket).toHaveBeenCalledWith(
+        "ticket-1",
+        activeUser,
+      );
+    });
+  });
+
+  describe("POST /support/tickets/:id/comments - AddTicketCommentDto validation", () => {
+    it("accepts a valid ticket comment", async () => {
+      await request(app.getHttpServer())
+        .post("/support/tickets/ticket-1/comments")
+        .send({ message: "Thanks, I can reproduce this issue now." })
+        .expect(201);
+
+      expect(supportService.addTicketComment).toHaveBeenCalledWith(
+        "ticket-1",
+        activeUser,
+        expect.objectContaining({
+          message: "Thanks, I can reproduce this issue now.",
+        }),
+      );
+    });
+
+    it("rejects a blank ticket comment", async () => {
+      const response = await request(app.getHttpServer())
+        .post("/support/tickets/ticket-1/comments")
+        .send({ message: "   " })
+        .expect(400);
+
+      expect(response.body.message).toBeDefined();
+      expect(supportService.addTicketComment).not.toHaveBeenCalled();
+    });
+
+    it("rejects ticket comments longer than 1000 characters", async () => {
+      const response = await request(app.getHttpServer())
+        .post("/support/tickets/ticket-1/comments")
+        .send({ message: "A".repeat(1001) })
+        .expect(400);
+
+      expect(response.body.message).toContain(
+        "Comment must not exceed 1000 characters",
+      );
+      expect(supportService.addTicketComment).not.toHaveBeenCalled();
     });
   });
 

@@ -190,6 +190,8 @@ model Tenant {
   activities       Activity[]
   insights         Insight[]
   tickets          Ticket[]
+  ticketComments   TicketComment[]
+  notifications    Notification[]
   invitations      Invitation[]
   onboardingProgress OnboardingProgress?
   
@@ -278,6 +280,8 @@ model User {
   invitationsSent  Invitation[]    @relation("InvitationInviter")
   invitation       Invitation?     @relation("InvitationUser")
   tickets          Ticket[]
+  ticketComments   TicketComment[]
+  notifications    Notification[]
   preference       UserPreference?
 
   @@index([tenantId, isActive])
@@ -563,9 +567,49 @@ model Ticket {
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  comments TicketComment[]
 
   @@index([tenantId, status])
   @@index([userId])
+}
+
+model TicketComment {
+  id        String   @id @default(cuid())
+  ticketId  String
+  userId    String
+  tenantId  String
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId, createdAt])
+  @@index([tenantId])
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  tenantId  String
+  userId    String?
+  type      String   @default("info")
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  readAt    DateTime?
+  actionUrl String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, userId, isRead, createdAt])
+  @@index([tenantId, isRead])
 }
 
 model Invitation {

@@ -27,7 +27,11 @@ import {
   TENANT_LEADERSHIP_ROLES,
   TENANT_MEMBER_ROLES,
 } from "../common/constants/roles.constants";
-import { CreateTicketDto, UpdateTicketDto } from "./dto/ticket.dto";
+import {
+  AddTicketCommentDto,
+  CreateTicketDto,
+  UpdateTicketDto,
+} from "./dto/ticket.dto";
 import { ApiTenantAuth } from "../common/docs/swagger.decorators";
 import { PaginationDto } from "../common/dto/pagination.dto";
 
@@ -66,6 +70,26 @@ export class SupportController {
     @Query() pagination: PaginationDto,
   ) {
     return this.supportService.getMyTickets(user.userId, user.tenantId, pagination);
+  }
+
+  @ApiOperation({ summary: "Get support ticket detail" })
+  @ApiOkResponse({ description: "Tenant-scoped ticket detail with comments" })
+  @Get("tickets/:id")
+  @Roles(...TENANT_MEMBER_ROLES)
+  async getTicket(@Param("id") id: string, @CurrentUser() user: UserContext) {
+    return this.supportService.getTicket(id, user);
+  }
+
+  @ApiOperation({ summary: "Add support ticket comment" })
+  @ApiCreatedResponse({ description: "Support ticket comment created" })
+  @Post("tickets/:id/comments")
+  @Roles(...TENANT_MEMBER_ROLES)
+  async addTicketComment(
+    @Param("id") id: string,
+    @Body() dto: AddTicketCommentDto,
+    @CurrentUser() user: UserContext,
+  ) {
+    return this.supportService.addTicketComment(id, user, dto);
   }
 
   @ApiOperation({ summary: "Update ticket status (Admin only)" })

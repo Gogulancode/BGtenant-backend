@@ -5,6 +5,7 @@ import {
   MinLength,
   MaxLength,
 } from "class-validator";
+import { Transform } from "class-transformer";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
 export enum SupportTicketStatus {
@@ -64,4 +65,18 @@ export class UpdateTicketDto {
   @IsString()
   @MaxLength(1000, { message: "Admin note must not exceed 1000 characters" })
   adminNote?: string;
+}
+
+export class AddTicketCommentDto {
+  @ApiProperty({
+    description: "Comment to add to the support ticket thread",
+    minLength: 1,
+    maxLength: 1000,
+    example: "Thanks, I can reproduce this issue now.",
+  })
+  @Transform(({ value }) => (typeof value === "string" ? value.trim() : value))
+  @IsString()
+  @MinLength(1, { message: "Comment is required" })
+  @MaxLength(1000, { message: "Comment must not exceed 1000 characters" })
+  message: string;
 }
