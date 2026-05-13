@@ -4,7 +4,13 @@ import {
   NotFoundException,
   BadRequestException,
 } from "@nestjs/common";
-import { Role, OnboardingProgress, SubscriptionPlan, Prisma } from "@prisma/client";
+import {
+  Role,
+  OnboardingProgress,
+  SubscriptionPlan,
+  SubscriptionStatus,
+  Prisma,
+} from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { EmailService } from "../notifications/email.service";
 import { startOfWeek, startOfNextWeek } from "../common/utils/date.utils";
@@ -40,6 +46,7 @@ import {
 import {
   AchievementStagesSetupDto,
   AchievementStagesSetupResponseDto,
+  generateDefaultAchievementStages,
 } from "./dto/achievement-stages.dto";
 import {
   SubscriptionSelectionDto,
@@ -611,27 +618,18 @@ export class OnboardingService {
     tenantId: string,
     dto: SubscriptionSelectionDto,
   ): Promise<SubscriptionSelectionResponseDto> {
+    const progress = await this.ensureProgress(tenantId);
+    const stepsCompleted = new Set(progress.stepsCompleted);
+    stepsCompleted.add(OnboardingStep.SUBSCRIPTION);
+
     await this.prisma.onboardingProgress.update({
       where: { tenantId },
       data: {
         selectedPlan: dto.plan,
         subscriptionCompleted: true,
+        stepsCompleted: Array.from(stepsCompleted),
       },
     });
-
-    // Add to stepsCompleted if not already present
-    const progress = await this.prisma.onboardingProgress.findUnique({
-      where: { tenantId },
-    });
-
-    if (progress && !progress.stepsCompleted.includes(OnboardingStep.SUBSCRIPTION)) {
-      await this.prisma.onboardingProgress.update({
-        where: { tenantId },
-        data: {
-          stepsCompleted: [...progress.stepsCompleted, OnboardingStep.SUBSCRIPTION],
-        },
-      });
-    }
 
     this.logger.log(
       `Subscription selected for tenant ${tenantId}: ${dto.plan}`,
@@ -667,13 +665,8 @@ export class OnboardingService {
   async completeOnboarding(
     tenantId: string,
   ): Promise<OnboardingProgressResponseDto> {
-    const progress = await this.prisma.onboardingProgress.findUnique({
-      where: { tenantId },
-    });
-
-    if (!progress) {
-      throw new NotFoundException("Onboarding progress not found");
-    }
+    await this.ensureDefaultCompletionArtifacts(tenantId);
+    const progress = await this.reconcileProgressWithSavedSetup(tenantId);
 
     // Validate all required steps are completed
     const requiredFlags = [
@@ -697,6 +690,9 @@ export class OnboardingService {
     }
 
     // Update onboarding progress and tenant
+    const completedSteps = new Set(progress.stepsCompleted);
+    completedSteps.add(OnboardingStep.VISUAL_SETUP);
+
     const [updated] = await this.prisma.$transaction([
       this.prisma.onboardingProgress.update({
         where: { tenantId },
@@ -704,9 +700,7 @@ export class OnboardingService {
           isCompleted: true,
           completedAt: new Date(),
           visualSetupCompleted: true,
-          stepsCompleted: {
-            push: OnboardingStep.VISUAL_SETUP,
-          },
+          stepsCompleted: Array.from(completedSteps),
           currentStep: MAX_ONBOARDING_STEPS,
         },
       }),
@@ -717,15 +711,28 @@ export class OnboardingService {
     ]);
 
     // Create actual subscription based on selected plan
-    if (progress.selectedPlan) {
-      const features = PLAN_FEATURES[progress.selectedPlan];
+    const selectedPlan = progress.selectedPlan ?? SubscriptionPlan.FREE;
+    const existingSubscription = await this.prisma.subscription.findFirst({
+      where: {
+        tenantId,
+        status: {
+          in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIAL],
+        },
+      },
+    });
+
+    if (!existingSubscription) {
+      const features = PLAN_FEATURES[selectedPlan];
       await this.prisma.subscription.create({
         data: {
           tenantId,
-          plan: progress.selectedPlan,
-          status: progress.selectedPlan === SubscriptionPlan.FREE ? 'ACTIVE' : 'TRIAL',
+          plan: selectedPlan,
+          status:
+            selectedPlan === SubscriptionPlan.FREE
+              ? SubscriptionStatus.ACTIVE
+              : SubscriptionStatus.TRIAL,
           trialEndsAt:
-            progress.selectedPlan !== SubscriptionPlan.FREE
+            selectedPlan !== SubscriptionPlan.FREE
               ? new Date(Date.now() + 14 * 24 * 60 * 60 * 1000) // 14 days trial
               : null,
           maxUsers: features.maxUsers,
@@ -749,11 +756,7 @@ export class OnboardingService {
     step: OnboardingStep,
     flagName: string,
   ): Promise<void> {
-    const progress = await this.prisma.onboardingProgress.findUnique({
-      where: { tenantId },
-    });
-
-    if (!progress) return;
+    const progress = await this.ensureProgress(tenantId);
 
     const updateData: Record<string, unknown> = {
       [flagName]: true,
@@ -770,6 +773,151 @@ export class OnboardingService {
     }
 
     await this.prisma.onboardingProgress.update({
+      where: { tenantId },
+      data: updateData,
+    });
+  }
+
+  private async ensureProgress(tenantId: string): Promise<OnboardingProgress> {
+    return this.prisma.onboardingProgress.upsert({
+      where: { tenantId },
+      update: {},
+      create: {
+        tenantId,
+        currentStep: 1,
+        stepsCompleted: [],
+        isCompleted: false,
+      },
+    });
+  }
+
+  private async ensureDefaultCompletionArtifacts(
+    tenantId: string,
+  ): Promise<void> {
+    const [salesCycleCount, achievementStageCount, salesPlan] =
+      await Promise.all([
+        this.prisma.salesCycleStage.count({ where: { tenantId } }),
+        this.prisma.achievementStage.count({ where: { tenantId } }),
+        this.prisma.salesPlan.findUnique({ where: { tenantId } }),
+      ]);
+
+    if (salesCycleCount === 0) {
+      await this.prisma.$transaction(
+        DEFAULT_SALES_CYCLE_STAGES.map((stage) =>
+          this.prisma.salesCycleStage.create({
+            data: {
+              tenantId,
+              name: stage.name,
+              order: stage.order,
+              color: stage.color,
+              description: stage.description,
+              probability: stage.probability ?? 0,
+              isActive: stage.isActive ?? true,
+            },
+          }),
+        ),
+      );
+    }
+
+    if (achievementStageCount === 0) {
+      const annualGoal = salesPlan?.projectedYearValue ?? 0;
+      const stages = generateDefaultAchievementStages(annualGoal);
+      await this.prisma.$transaction(
+        stages.map((stage) =>
+          this.prisma.achievementStage.create({
+            data: {
+              tenantId,
+              name: stage.name,
+              order: stage.order,
+              targetValue: stage.targetValue,
+              percentOfGoal: stage.percentOfGoal,
+              color: stage.color,
+              icon: stage.icon,
+              reward: stage.reward,
+              isActive: stage.isActive ?? true,
+            },
+          }),
+        ),
+      );
+    }
+  }
+
+  private async reconcileProgressWithSavedSetup(
+    tenantId: string,
+  ): Promise<OnboardingProgress> {
+    const progress = await this.ensureProgress(tenantId);
+    const [
+      user,
+      businessIdentity,
+      salesPlan,
+      activityConfiguration,
+      salesCycleCount,
+      achievementStageCount,
+    ] = await Promise.all([
+      this.prisma.user.findFirst({
+        where: { tenantId },
+        select: { name: true },
+      }),
+      this.prisma.businessIdentity.findUnique({ where: { tenantId } }),
+      this.prisma.salesPlan.findUnique({ where: { tenantId } }),
+      this.prisma.activityConfiguration.findUnique({ where: { tenantId } }),
+      this.prisma.salesCycleStage.count({ where: { tenantId } }),
+      this.prisma.achievementStage.count({ where: { tenantId } }),
+    ]);
+
+    const stepsCompleted = new Set(progress.stepsCompleted);
+    const updateData: Prisma.OnboardingProgressUpdateInput = {};
+    const mark = (
+      completed: boolean,
+      flagName: keyof Pick<
+        OnboardingProgress,
+        | "profileCompleted"
+        | "businessIdentityCompleted"
+        | "salesPlanCompleted"
+        | "activityConfigCompleted"
+        | "salesCycleCompleted"
+        | "achievementStagesCompleted"
+        | "subscriptionCompleted"
+      >,
+      step: OnboardingStep,
+    ) => {
+      if (!completed) return;
+      if (!progress[flagName]) {
+        updateData[flagName] = true;
+      }
+      stepsCompleted.add(step);
+    };
+
+    mark(Boolean(user?.name), "profileCompleted", OnboardingStep.PROFILE);
+    mark(
+      Boolean(businessIdentity?.companyName && businessIdentity?.usp),
+      "businessIdentityCompleted",
+      OnboardingStep.BUSINESS_IDENTITY,
+    );
+    mark(Boolean(salesPlan), "salesPlanCompleted", OnboardingStep.SALES_PLAN);
+    mark(
+      Boolean(activityConfiguration),
+      "activityConfigCompleted",
+      OnboardingStep.ACTIVITY_CONFIG,
+    );
+    mark(
+      salesCycleCount > 0,
+      "salesCycleCompleted",
+      OnboardingStep.SALES_CYCLE,
+    );
+    mark(
+      achievementStageCount > 0,
+      "achievementStagesCompleted",
+      OnboardingStep.ACHIEVEMENT_STAGES,
+    );
+    mark(true, "subscriptionCompleted", OnboardingStep.SUBSCRIPTION);
+
+    if (!progress.selectedPlan) {
+      updateData.selectedPlan = SubscriptionPlan.FREE;
+    }
+    updateData.stepsCompleted = Array.from(stepsCompleted);
+
+    return this.prisma.onboardingProgress.update({
       where: { tenantId },
       data: updateData,
     });

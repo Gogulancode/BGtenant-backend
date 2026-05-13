@@ -12,6 +12,7 @@ describe("SalesService summary validation", () => {
     salesPlanning: { findFirst: jest.Mock };
     salesTracker: { findFirst: jest.Mock };
     salesPlan: { findUnique: jest.Mock };
+    weeklySalesEntry: { findMany: jest.Mock };
     $transaction: jest.Mock;
   };
 
@@ -21,6 +22,7 @@ describe("SalesService summary validation", () => {
       salesPlanning: { findFirst: jest.fn() },
       salesTracker: { findFirst: jest.fn() },
       salesPlan: { findUnique: jest.fn() },
+      weeklySalesEntry: { findMany: jest.fn().mockResolvedValue([]) },
       $transaction: jest.fn((operations: Promise<unknown>[]) =>
         Promise.all(operations),
       ),

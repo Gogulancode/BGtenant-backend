@@ -51,7 +51,10 @@ export class DashboardService {
       activities,
       insights,
       user,
+      onboardingProgress,
       setupChecklist,
+      businessIdentity,
+      salesPlan,
       activityConfiguration,
       prospectGroups,
       nextFollowUps,
@@ -71,7 +74,22 @@ export class DashboardService {
         select: { id: true, name: true },
       }),
       tenantId
+        ? this.prisma.onboardingProgress.findUnique({
+            where: { tenantId },
+          })
+        : Promise.resolve(null),
+      tenantId
         ? this.prisma.businessSetupChecklist.findUnique({
+            where: { tenantId },
+          })
+        : Promise.resolve(null),
+      tenantId
+        ? this.prisma.businessIdentity.findUnique({
+            where: { tenantId },
+          })
+        : Promise.resolve(null),
+      tenantId
+        ? this.prisma.salesPlan.findUnique({
             where: { tenantId },
           })
         : Promise.resolve(null),
@@ -116,7 +134,14 @@ export class DashboardService {
       this.outcomesService.getWeeklySummary(userId, tenantId, {}),
     ]);
 
-    const setup = this.buildSetupCockpit(setupChecklist);
+    const setup = this.buildSetupCockpit({
+      activityConfiguration,
+      businessIdentity,
+      onboardingProgress,
+      salesPlan,
+      setupChecklist,
+      user,
+    });
     const cockpit = {
       setup,
       sales: this.buildSalesCockpit(sales),
@@ -156,38 +181,86 @@ export class DashboardService {
     };
   }
 
-  private buildSetupCockpit(
+  private buildSetupCockpit(input: {
+    activityConfiguration: {
+      weeklyActivityGoal?: number | null;
+      activities?: unknown;
+    } | null;
+    businessIdentity: {
+      companyName?: string | null;
+      usp?: string | null;
+    } | null;
+    onboardingProgress: {
+      profileCompleted: boolean;
+      businessIdentityCompleted: boolean;
+      salesPlanCompleted: boolean;
+      activityConfigCompleted: boolean;
+      isCompleted: boolean;
+    } | null;
+    salesPlan: {
+      projectedYearValue?: number | null;
+      monthlyTargets?: number[] | null;
+    } | null;
     setupChecklist: {
       uspDefined: boolean;
       menuCardDefined: boolean;
       packagesDefined: boolean;
       customerSegmentDefined: boolean;
-    } | null,
-  ) {
+    } | null;
+    user: { name: string | null } | null;
+  }) {
+    const {
+      activityConfiguration,
+      businessIdentity,
+      onboardingProgress,
+      salesPlan,
+      setupChecklist,
+      user,
+    } = input;
+    const hasLegacyBusinessChecklist =
+      Boolean(setupChecklist?.uspDefined) &&
+      Boolean(setupChecklist?.menuCardDefined) &&
+      Boolean(setupChecklist?.packagesDefined) &&
+      Boolean(setupChecklist?.customerSegmentDefined);
     const items = [
       {
-        key: "uspDefined",
-        label: "Define USP",
-        path: "/settings",
-        completed: setupChecklist?.uspDefined ?? false,
+        key: "profileCompleted",
+        label: "Complete Profile",
+        path: "/onboarding",
+        completed:
+          onboardingProgress?.profileCompleted ??
+          Boolean(user?.name),
       },
       {
-        key: "menuCardDefined",
-        label: "Create Menu Card",
-        path: "/settings",
-        completed: setupChecklist?.menuCardDefined ?? false,
+        key: "businessIdentityCompleted",
+        label: "Define Business Identity",
+        path: "/onboarding",
+        completed:
+          Boolean(onboardingProgress?.businessIdentityCompleted) ||
+          Boolean(businessIdentity?.companyName && businessIdentity?.usp) ||
+          hasLegacyBusinessChecklist,
       },
       {
-        key: "packagesDefined",
-        label: "Define Packages",
-        path: "/settings",
-        completed: setupChecklist?.packagesDefined ?? false,
+        key: "salesPlanCompleted",
+        label: "Build Sales Plan",
+        path: "/onboarding",
+        completed:
+          Boolean(onboardingProgress?.salesPlanCompleted) ||
+          Boolean(
+            salesPlan?.projectedYearValue &&
+              (salesPlan?.monthlyTargets?.length ?? 0) > 0,
+          ),
       },
       {
-        key: "customerSegmentDefined",
-        label: "Define Customer Segments",
-        path: "/settings",
-        completed: setupChecklist?.customerSegmentDefined ?? false,
+        key: "activityConfigCompleted",
+        label: "Create Activity Rhythm",
+        path: "/onboarding",
+        completed:
+          Boolean(onboardingProgress?.activityConfigCompleted) ||
+          Boolean(
+            activityConfiguration?.weeklyActivityGoal ||
+              toArray<ActivityTemplate>(activityConfiguration?.activities).length,
+          ),
       },
     ];
     const completedCount = items.filter((item) => item.completed).length;

@@ -25,6 +25,28 @@ function startOfWeek(date = new Date()): Date {
   return copy;
 }
 
+function getWeekNumberInYear(date: Date): number {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil(
+    ((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7,
+  );
+  return Math.min(weekNo, 52);
+}
+
+function getIsoWeeksForMonth(year: number, month: number): number[] {
+  const weeks = new Set<number>();
+  const lastDay = new Date(year, month, 0).getDate();
+
+  for (let day = 1; day <= lastDay; day++) {
+    weeks.add(getWeekNumberInYear(new Date(year, month - 1, day)));
+  }
+
+  return Array.from(weeks);
+}
+
 function slug(value: string): string {
   return value
     .toLowerCase()
@@ -56,12 +78,18 @@ export class DashboardGuidanceService {
 
     const month = currentMonthKey();
     const weekStart = startOfWeek();
+    const now = new Date();
+    const year = now.getFullYear();
+    const monthNumber = now.getMonth() + 1;
+    const monthWeeks = getIsoWeeksForMonth(year, monthNumber);
 
     const [
       onboarding,
       setup,
+      businessIdentity,
       salesPlan,
       salesTracker,
+      weeklySalesEntries,
       prospectCount,
       followUps,
       weeklyActivityCount,
@@ -69,9 +97,19 @@ export class DashboardGuidanceService {
     ] = await Promise.all([
       this.prisma.onboardingProgress.findUnique({ where: { tenantId } }),
       this.prisma.businessSetupChecklist.findUnique({ where: { tenantId } }),
+      this.prisma.businessIdentity.findUnique({ where: { tenantId } }),
       this.prisma.salesPlan.findUnique({ where: { tenantId } }),
       this.prisma.salesTracker.findUnique({
         where: { tenantId_userId_month: { tenantId, userId, month } },
+      }),
+      this.prisma.weeklySalesEntry.findMany({
+        where: {
+          tenantId,
+          userId,
+          year,
+          week: { in: monthWeeks },
+        },
+        select: { achieved: true },
       }),
       this.prisma.salesProspect.count({ where: { tenantId, userId } }),
       this.prisma.salesProspect.findMany({
@@ -102,21 +140,35 @@ export class DashboardGuidanceService {
     const cards: GuidanceCardDto[] = [];
     const signals: GuidanceSignalDto[] = [];
 
-    const setupComplete =
-      Boolean(onboarding?.isCompleted) &&
+    const legacySetupComplete =
       Boolean(setup?.uspDefined) &&
       Boolean(setup?.menuCardDefined) &&
       Boolean(setup?.packagesDefined) &&
       Boolean(setup?.customerSegmentDefined);
+    const setupComplete =
+      Boolean(onboarding?.isCompleted) ||
+      (
+        Boolean(onboarding?.businessIdentityCompleted) ||
+        Boolean(businessIdentity?.companyName && businessIdentity?.usp) ||
+        legacySetupComplete
+      ) &&
+        (
+          Boolean(onboarding?.salesPlanCompleted) ||
+          Boolean(salesPlan?.projectedYearValue)
+        ) &&
+        (
+          Boolean(onboarding?.activityConfigCompleted) ||
+          Boolean(activityConfiguration?.weeklyActivityGoal)
+        );
 
     if (!setupComplete) {
       cards.push({
         id: "complete-business-setup",
         type: "next_action",
         priority: "high",
-        title: "Strengthen your business foundation",
+        title: "Finish your setup next",
         message:
-          "A few setup details are still open. Complete them so your sales plan and profile feel sharper.",
+          "A few setup details are still open. Complete them so your sales plan, activity rhythm, and profile stay aligned.",
         actionLabel: "Finish setup",
         actionRoute: "/setup",
         source: "setup",
@@ -127,7 +179,13 @@ export class DashboardGuidanceService {
       Number(salesTracker?.target) ||
       Number(salesPlan?.monthlyTargets?.[new Date().getMonth()]) ||
       0;
-    const monthlyAchieved = Number(salesTracker?.achieved) || 0;
+    const monthlyAchieved =
+      weeklySalesEntries.length > 0
+        ? weeklySalesEntries.reduce(
+            (total, entry) => total + (Number(entry.achieved) || 0),
+            0,
+          )
+        : Number(salesTracker?.achieved) || 0;
     const monthlyProgress = percent(monthlyAchieved, monthlyTarget);
 
     if (monthlyTarget > 0) {
@@ -251,7 +309,7 @@ export class DashboardGuidanceService {
 
     return {
       summary: {
-        title: "Today's Focus",
+        title: primaryCard.title,
         message: primaryCard.message,
         tone: "encouraging",
         healthScore,

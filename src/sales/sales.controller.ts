@@ -134,8 +134,6 @@ export class SalesController {
 
   @ApiOperation({ summary: "Get current period targets with achievement data" })
   @ApiOkResponse({ description: "Current period sales targets", type: CurrentPeriodTargetsDto })
-  @UseInterceptors(CacheInterceptor)
-  @CacheTTL(60)
   @Get("targets")
   @Roles(...TENANT_MEMBER_ROLES)
   async getCurrentTargets(@CurrentUser() user: UserContext) {
@@ -147,8 +145,6 @@ export class SalesController {
 
   @ApiOperation({ summary: "Get all monthly targets for the year" })
   @ApiOkResponse({ description: "Monthly targets breakdown", type: [MonthlyTargetDto] })
-  @UseInterceptors(CacheInterceptor)
-  @CacheTTL(300)
   @Get("targets/monthly")
   @Roles(...TENANT_MEMBER_ROLES)
   async getMonthlyTargets(@CurrentUser() user: UserContext) {
@@ -157,8 +153,6 @@ export class SalesController {
 
   @ApiOperation({ summary: "Get all 52 weekly targets for the year" })
   @ApiOkResponse({ description: "Weekly targets breakdown", type: [WeeklyTargetDto] })
-  @UseInterceptors(CacheInterceptor)
-  @CacheTTL(300)
   @Get("targets/weekly")
   @Roles(...TENANT_MEMBER_ROLES)
   async getWeeklyTargets(@CurrentUser() user: UserContext) {
@@ -167,8 +161,6 @@ export class SalesController {
 
   @ApiOperation({ summary: "Get target for a specific week" })
   @ApiOkResponse({ description: "Weekly target for specified week", type: WeeklyTargetDto })
-  @UseInterceptors(CacheInterceptor)
-  @CacheTTL(300)
   @Get("targets/week")
   @Roles(...TENANT_MEMBER_ROLES)
   async getWeekTarget(
@@ -189,8 +181,6 @@ export class SalesController {
     description: "Weekly summary trend with targets, achieved, and achievement stages",
     type: WeeklySummaryResponseDto,
   })
-  @UseInterceptors(CacheInterceptor)
-  @CacheTTL(60)
   @Get("weekly-summary")
   @Roles(...TENANT_MEMBER_ROLES)
   async getWeeklySummary(

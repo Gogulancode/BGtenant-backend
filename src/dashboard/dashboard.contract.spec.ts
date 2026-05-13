@@ -47,6 +47,15 @@ function createService() {
           name: "Asha Owner",
         }),
       },
+      onboardingProgress: {
+        findUnique: jest.fn().mockResolvedValue({
+          profileCompleted: true,
+          businessIdentityCompleted: true,
+          salesPlanCompleted: false,
+          activityConfigCompleted: true,
+          isCompleted: false,
+        }),
+      },
       businessSetupChecklist: {
         findUnique: jest.fn().mockResolvedValue({
           uspDefined: true,
@@ -54,6 +63,15 @@ function createService() {
           packagesDefined: false,
           customerSegmentDefined: true,
         }),
+      },
+      businessIdentity: {
+        findUnique: jest.fn().mockResolvedValue({
+          companyName: "Bridge Gaps",
+          usp: "Accountability operating system for growing businesses",
+        }),
+      },
+      salesPlan: {
+        findUnique: jest.fn().mockResolvedValue(null),
       },
       activityConfiguration: {
         findUnique: jest.fn().mockResolvedValue({
@@ -187,7 +205,7 @@ describe("Dashboard summary contract", () => {
     expect(result.cockpit).toMatchObject({
       setup: {
         completionPercent: 75,
-        nextStepLabel: "Define Packages",
+        nextStepLabel: "Build Sales Plan",
       },
       sales: {
         weeklyTarget: 50000,

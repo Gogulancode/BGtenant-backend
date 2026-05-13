@@ -189,11 +189,26 @@ export class SalesTargetsService {
       where: { tenantId: scopedTenantId },
     });
 
-    // Get current month tracker for achieved values
+    // Get current month tracker for legacy achieved values
     const monthKey = `${year}-${String(currentMonth).padStart(2, "0")}`;
-    const tracker = await this.prisma.salesTracker.findFirst({
-      where: { userId, tenantId: scopedTenantId, month: monthKey },
-    });
+    const monthWeeks = this.getIsoWeeksForMonth(year, currentMonth);
+    const [tracker, weeklyEntries] = await Promise.all([
+      this.prisma.salesTracker.findFirst({
+        where: { userId, tenantId: scopedTenantId, month: monthKey },
+      }),
+      this.prisma.weeklySalesEntry.findMany({
+        where: {
+          userId,
+          tenantId: scopedTenantId,
+          year,
+          week: { in: monthWeeks },
+        },
+        select: {
+          week: true,
+          achieved: true,
+        },
+      }),
+    ]);
 
     // Calculate targets
     const monthlyTarget = salesPlan?.monthlyTargets[currentMonth - 1] ?? 0;
@@ -204,16 +219,20 @@ export class SalesTargetsService {
     const weekInMonth = this.getWeekInMonth(now);
     const weeksRemainingInMonth = weeksInCurrentMonth - weekInMonth;
 
-    // Get achieved values
-    const achievedThisMonth = tracker?.achieved ?? 0;
-    
-    // Estimate weekly achieved (proportional to days elapsed in week)
-    const daysElapsedInWeek = dayOfWeek === 0 ? 7 : dayOfWeek;
-    const achievedThisWeek = this.estimateWeeklyAchieved(
-      achievedThisMonth,
-      now,
-      weeksInCurrentMonth,
+    const hasWeeklyEntries = weeklyEntries.length > 0;
+    const achievedThisMonth = hasWeeklyEntries
+      ? weeklyEntries.reduce((total, entry) => total + (entry.achieved ?? 0), 0)
+      : tracker?.achieved ?? 0;
+    const currentWeekEntry = weeklyEntries.find(
+      (entry) => entry.week === currentWeek,
     );
+    const achievedThisWeek = hasWeeklyEntries
+      ? currentWeekEntry?.achieved ?? 0
+      : this.estimateWeeklyAchieved(
+          achievedThisMonth,
+          now,
+          weeksInCurrentMonth,
+        );
 
     // Calculate achievement percentages
     const monthlyAchievementPercent = monthlyTarget > 0
@@ -259,6 +278,17 @@ export class SalesTargetsService {
     const dayOfMonth = date.getDate();
     const firstDayOfWeek = firstOfMonth.getDay();
     return Math.ceil((dayOfMonth + firstDayOfWeek) / 7);
+  }
+
+  private getIsoWeeksForMonth(year: number, month: number): number[] {
+    const weeks = new Set<number>();
+    const lastDay = new Date(year, month, 0).getDate();
+
+    for (let day = 1; day <= lastDay; day++) {
+      weeks.add(this.getWeekNumberInYear(new Date(year, month - 1, day)));
+    }
+
+    return Array.from(weeks);
   }
 
   /**
@@ -358,7 +388,7 @@ export class SalesTargetsService {
     }
 
     // Load all required data in parallel (single queries, no N+1)
-    const [salesPlan, achievementStages, trackerEntries] = await Promise.all([
+    const [salesPlan, achievementStages, weeklyEntries, trackerEntries] = await Promise.all([
       this.prisma.salesPlan.findUnique({
         where: { tenantId: scopedTenantId },
       }),
@@ -366,20 +396,33 @@ export class SalesTargetsService {
         where: { tenantId: scopedTenantId, isActive: true },
         orderBy: { order: "asc" },
       }),
+      this.prisma.weeklySalesEntry.findMany({
+        where: {
+          tenantId: scopedTenantId,
+          year: targetYear,
+          week: { gte: startWeek, lte: endWeek },
+        },
+        select: {
+          week: true,
+          achieved: true,
+        },
+      }),
       this.getTrackerEntriesForWeekRange(scopedTenantId, targetYear, startWeek, endWeek),
     ]);
 
     // Compute weekly targets array (52 weeks)
     const weeklyTargets = this.computeWeeklyTargetsArray(salesPlan?.monthlyTargets ?? []);
     
-    // Group tracker entries by week
-    const achievedByWeek = this.groupTrackersByWeek(trackerEntries, targetYear);
+    const achievedByWeek = this.groupWeeklyEntriesByWeek(weeklyEntries);
+    const fallbackAchievedByWeek = this.groupTrackersByWeek(trackerEntries, targetYear);
     
     // Build items for each week in range
     const items: WeeklySummaryItem[] = [];
     for (let week = startWeek; week <= endWeek; week++) {
       const target = weeklyTargets[week - 1] ?? 0;
-      const achieved = achievedByWeek.get(week) ?? 0;
+      const achieved = achievedByWeek.has(week)
+        ? achievedByWeek.get(week) ?? 0
+        : fallbackAchievedByWeek.get(week) ?? 0;
       const achievementPercent = target > 0 
         ? Number(((achieved / target) * 100).toFixed(2)) 
         : 0;
@@ -528,6 +571,18 @@ export class SalesTargetsService {
       }
     }
     
+    return byWeek;
+  }
+
+  private groupWeeklyEntriesByWeek(
+    entries: Array<{ week: number; achieved: number | null }>,
+  ): Map<number, number> {
+    const byWeek = new Map<number, number>();
+
+    for (const entry of entries) {
+      byWeek.set(entry.week, (byWeek.get(entry.week) ?? 0) + (entry.achieved ?? 0));
+    }
+
     return byWeek;
   }
 

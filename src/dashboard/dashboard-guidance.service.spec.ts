@@ -29,6 +29,12 @@ function createPrismaMock(overrides: Record<string, unknown> = {}) {
         customerSegmentDefined: true,
       }),
     },
+    businessIdentity: {
+      findUnique: jest.fn().mockResolvedValue({
+        companyName: "Bridge Gaps",
+        usp: "Accountability operating system for growing businesses",
+      }),
+    },
     salesPlan: {
       findUnique: jest.fn().mockResolvedValue({
         projectedYearValue: 1200000,
@@ -47,6 +53,9 @@ function createPrismaMock(overrides: Record<string, unknown> = {}) {
         target: 100000,
         achieved: 42000,
       }),
+    },
+    weeklySalesEntry: {
+      findMany: jest.fn().mockResolvedValue([]),
     },
     salesProspect: {
       count: jest.fn().mockResolvedValue(0),
@@ -69,11 +78,17 @@ function createPrismaMock(overrides: Record<string, unknown> = {}) {
 
 describe("DashboardGuidanceService", () => {
   it("returns setup guidance when onboarding or business setup is incomplete", async () => {
-    const service = new DashboardGuidanceService(createPrismaMock());
+    const service = new DashboardGuidanceService(
+      createPrismaMock({
+        businessIdentity: {
+          findUnique: jest.fn().mockResolvedValue(null),
+        },
+      }),
+    );
 
     const result = await service.getGuidance(userId, tenantId);
 
-    expect(result.summary.title).toBe("Today's Focus");
+    expect(result.summary.title).toBe("Finish your setup next");
     expect(result.cards).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -179,8 +194,10 @@ describe("DashboardGuidanceService", () => {
     const prisma = createPrismaMock() as unknown as {
       onboardingProgress: { findUnique: jest.Mock };
       businessSetupChecklist: { findUnique: jest.Mock };
+      businessIdentity: { findUnique: jest.Mock };
       salesPlan: { findUnique: jest.Mock };
       salesTracker: { findUnique: jest.Mock };
+      weeklySalesEntry: { findMany: jest.Mock };
       salesProspect: { count: jest.Mock; findMany: jest.Mock };
       activity: { count: jest.Mock };
       activityConfiguration: { findUnique: jest.Mock };
@@ -194,10 +211,22 @@ describe("DashboardGuidanceService", () => {
     expect(prisma.onboardingProgress.findUnique).toHaveBeenCalledWith({
       where: { tenantId },
     });
+    expect(prisma.businessIdentity.findUnique).toHaveBeenCalledWith({
+      where: { tenantId },
+    });
     expect(prisma.salesTracker.findUnique).toHaveBeenCalledWith({
       where: {
         tenantId_userId_month: expect.objectContaining({ tenantId, userId }),
       },
+    });
+    expect(prisma.weeklySalesEntry.findMany).toHaveBeenCalledWith({
+      where: {
+        tenantId,
+        userId,
+        year: expect.any(Number),
+        week: { in: expect.any(Array) },
+      },
+      select: { achieved: true },
     });
     expect(prisma.salesProspect.count).toHaveBeenCalledWith({
       where: { tenantId, userId },

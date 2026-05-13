@@ -147,9 +147,6 @@ export class SalesService {
       ],
     );
 
-    const progress = tracker?.target
-      ? Number((((tracker.achieved ?? 0) / tracker.target) * 100).toFixed(2))
-      : 0;
     const validation = this.buildValidationSnapshot(
       now,
       planning,
@@ -163,6 +160,12 @@ export class SalesService {
       userId,
       tenantId,
     );
+    const progress =
+      targets.monthlyTarget > 0
+        ? targets.monthlyAchievementPercent
+        : tracker?.target
+          ? Number((((tracker.achieved ?? 0) / tracker.target) * 100).toFixed(2))
+          : 0;
 
     return {
       planning,
