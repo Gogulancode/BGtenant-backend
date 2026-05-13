@@ -4,6 +4,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import {
   DashboardGuidanceDto,
   GuidanceCardDto,
+  GuidanceJourneyStage,
   GuidanceSignalDto,
 } from "./dto/dashboard-guidance.dto";
 
@@ -54,6 +55,24 @@ function slug(value: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
+function getJourneyStage(input: {
+  setupComplete: boolean;
+  hasCurrentWeeklySalesEntry: boolean;
+  monthlyProgress: number;
+  prospectCount: number;
+  activityProgress: number;
+  weeklyGoal: number;
+}): GuidanceJourneyStage {
+  if (!input.setupComplete) return "Foundation";
+  if (!input.hasCurrentWeeklySalesEntry) return "Rhythm";
+  if (input.prospectCount < 3) return "Pipeline";
+  if (input.monthlyProgress < 70 || input.activityProgress < 70) {
+    return "Growth";
+  }
+  if (input.weeklyGoal === 0) return "Rhythm";
+  return "Scale";
+}
+
 @Injectable()
 export class DashboardGuidanceService {
   constructor(private readonly prisma: PrismaService) {}
@@ -69,6 +88,7 @@ export class DashboardGuidanceService {
           message: "Sign in with a tenant workspace to see your coaching focus.",
           tone: "encouraging",
           healthScore: 0,
+          journeyStage: "Foundation",
         },
         cards: [],
         signals: [],
@@ -109,7 +129,7 @@ export class DashboardGuidanceService {
           year,
           week: { in: monthWeeks },
         },
-        select: { achieved: true },
+        select: { week: true, achieved: true },
       }),
       this.prisma.salesProspect.count({ where: { tenantId, userId } }),
       this.prisma.salesProspect.findMany({
@@ -169,9 +189,13 @@ export class DashboardGuidanceService {
         title: "Finish your setup next",
         message:
           "A few setup details are still open. Complete them so your sales plan, activity rhythm, and profile stay aligned.",
+        why: "A complete setup lets the coach connect your goals, activity rhythm, and profile into one operating plan.",
         actionLabel: "Finish setup",
         actionRoute: "/setup",
         source: "setup",
+        impactMetric: "setup_completion",
+        afterActionMessage:
+          "Good. Your foundation is stronger now. Next, keep the week moving with sales and activity rhythm.",
       });
     }
 
@@ -187,6 +211,10 @@ export class DashboardGuidanceService {
           )
         : Number(salesTracker?.achieved) || 0;
     const monthlyProgress = percent(monthlyAchieved, monthlyTarget);
+    const currentWeek = getWeekNumberInYear(now);
+    const hasCurrentWeeklySalesEntry = weeklySalesEntries.some(
+      (entry) => entry.week === currentWeek,
+    );
 
     if (monthlyTarget > 0) {
       signals.push({
@@ -203,16 +231,38 @@ export class DashboardGuidanceService {
       });
     }
 
+    if (setupComplete && monthlyTarget > 0 && !hasCurrentWeeklySalesEntry) {
+      cards.push({
+        id: "log-weekly-sales",
+        type: "next_action",
+        priority: "high",
+        title: "Log this week's sales",
+        message:
+          "Your setup is ready. Add this week's sales so the coach can show the true gap and next move.",
+        why: "Weekly sales is the pulse check that keeps targets, reports, and next actions accurate.",
+        actionLabel: "Log sales",
+        actionRoute: "/sales",
+        source: "sales",
+        impactMetric: "weekly_sales",
+        afterActionMessage:
+          "Good. Your sales pulse is updated. Next, close the loop with one follow-up or activity.",
+      });
+    }
+
     if (monthlyTarget > 0 && monthlyProgress < 70) {
       cards.push({
         id: "sales-gap-followups",
         type: "next_action",
         priority: "high",
         title: "Close the sales gap",
-        message: `You're ${monthlyProgress}% toward this month's target. A focused follow-up today can protect the month.`,
+        message: `You are ${monthlyProgress}% toward this month's target. A focused follow-up today can protect the month.`,
+        why: "Follow-ups are the fastest action connected to this week's sales gap.",
         actionLabel: "Log sales",
         actionRoute: "/sales",
         source: "sales",
+        impactMetric: "sales_gap",
+        afterActionMessage:
+          "Good. Your sales progress moved. Next, schedule one follow-up to protect the month.",
       });
     }
 
@@ -232,9 +282,13 @@ export class DashboardGuidanceService {
         title: "Build your first follow-up list",
         message:
           "Start with three prospects you can contact this week. Small lists create real rhythm.",
+        why: "A visible pipeline gives every sales week a practical starting point.",
         actionLabel: "Add prospects",
         actionRoute: "/sales/prospects",
         source: "crm",
+        impactMetric: "crm_pipeline",
+        afterActionMessage:
+          "Nice. Your pipeline has started. Next, add a follow-up date for the warmest prospect.",
       });
     } else if (followUps.length > 0) {
       const prospect = followUps[0];
@@ -246,9 +300,13 @@ export class DashboardGuidanceService {
         title: `Follow up with ${prospect.prospectName}`,
         message:
           "This prospect is already warm. A timely follow-up can move the conversation forward.",
+        why: "Warm and hot prospects usually need a clear next touch before they cool down.",
         actionLabel: "Follow up",
         actionRoute: "/sales/prospects",
         source: "crm",
+        impactMetric: "crm_pipeline",
+        afterActionMessage:
+          "Good follow-up. Next, log the outcome so your pipeline stays current.",
       });
     }
 
@@ -277,9 +335,13 @@ export class DashboardGuidanceService {
         priority: "medium",
         title: "Rebuild today's activity rhythm",
         message: `You've logged ${weeklyActivityCount} of ${weeklyGoal} planned activities this week. Add one useful action today.`,
+        why: "Activity rhythm is the habit layer that turns the sales plan into daily movement.",
         actionLabel: "Add activity",
         actionRoute: "/activities",
         source: "activity",
+        impactMetric: "activity_rhythm",
+        afterActionMessage:
+          "Good. Your rhythm improved. Next, connect this action to a prospect or weekly outcome.",
       });
     }
 
@@ -291,9 +353,13 @@ export class DashboardGuidanceService {
         title: "Your rhythm is on track",
         message:
           "You have the core pieces moving. Review your dashboard and keep one meaningful follow-up active today.",
+        why: "A healthy week is the right time to review the profile and raise the quality of your next actions.",
         actionLabel: "Review dashboard",
         actionRoute: "/dashboard",
         source: "profile",
+        impactMetric: "business_profile",
+        afterActionMessage:
+          "Good. Keep the week clean by reviewing one growth action before the next check-in.",
       });
     }
 
@@ -306,6 +372,14 @@ export class DashboardGuidanceService {
       ].reduce((total, item) => total + item, 0) / 4,
     );
     const primaryCard = cards[0];
+    const journeyStage = getJourneyStage({
+      setupComplete,
+      hasCurrentWeeklySalesEntry,
+      monthlyProgress,
+      prospectCount,
+      activityProgress,
+      weeklyGoal,
+    });
 
     return {
       summary: {
@@ -313,6 +387,7 @@ export class DashboardGuidanceService {
         message: primaryCard.message,
         tone: "encouraging",
         healthScore,
+        journeyStage,
       },
       cards: cards.slice(0, 5),
       signals,

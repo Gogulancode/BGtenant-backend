@@ -89,12 +89,16 @@ describe("DashboardGuidanceService", () => {
     const result = await service.getGuidance(userId, tenantId);
 
     expect(result.summary.title).toBe("Finish your setup next");
+    expect(result.summary.journeyStage).toBe("Foundation");
     expect(result.cards).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           id: "complete-business-setup",
           source: "setup",
           priority: "high",
+          why: expect.any(String),
+          impactMetric: "setup_completion",
+          afterActionMessage: expect.any(String),
           actionRoute: "/setup",
         }),
       ]),
@@ -118,6 +122,42 @@ describe("DashboardGuidanceService", () => {
     );
   });
 
+  it("returns weekly sales guidance when setup is complete but current week sales are missing", async () => {
+    const service = new DashboardGuidanceService(
+      createPrismaMock({
+        onboardingProgress: {
+          findUnique: jest.fn().mockResolvedValue({
+            tenantId,
+            isCompleted: true,
+            profileCompleted: true,
+            businessIdentityCompleted: true,
+            salesPlanCompleted: true,
+            activityConfigCompleted: true,
+            salesCycleCompleted: true,
+            achievementStagesCompleted: true,
+            subscriptionCompleted: true,
+            visualSetupCompleted: true,
+          }),
+        },
+      }),
+    );
+
+    const result = await service.getGuidance(userId, tenantId);
+
+    expect(result.summary.journeyStage).toBe("Rhythm");
+    expect(result.cards).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "log-weekly-sales",
+          source: "sales",
+          impactMetric: "weekly_sales",
+          why: expect.any(String),
+          afterActionMessage: expect.any(String),
+        }),
+      ]),
+    );
+  });
+
   it("returns sales gap guidance when monthly achievement is behind target", async () => {
     const service = new DashboardGuidanceService(createPrismaMock());
 
@@ -129,6 +169,8 @@ describe("DashboardGuidanceService", () => {
           id: "sales-gap-followups",
           source: "sales",
           priority: "high",
+          impactMetric: "sales_gap",
+          why: expect.any(String),
           actionRoute: "/sales",
         }),
       ]),
@@ -146,6 +188,9 @@ describe("DashboardGuidanceService", () => {
 
   it("returns CRM follow-up guidance for warm or hot prospects", async () => {
     const prisma = createPrismaMock({
+      weeklySalesEntry: {
+        findMany: jest.fn().mockResolvedValue([{ week: 20, achieved: 75000 }]),
+      },
       salesProspect: {
         count: jest.fn().mockResolvedValue(3),
         findMany: jest.fn().mockResolvedValue([
@@ -169,6 +214,7 @@ describe("DashboardGuidanceService", () => {
           id: "crm-followup-acme-traders",
           source: "crm",
           actionLabel: "Follow up",
+          why: expect.any(String),
         }),
       ]),
     );
@@ -226,7 +272,7 @@ describe("DashboardGuidanceService", () => {
         year: expect.any(Number),
         week: { in: expect.any(Array) },
       },
-      select: { achieved: true },
+      select: { week: true, achieved: true },
     });
     expect(prisma.salesProspect.count).toHaveBeenCalledWith({
       where: { tenantId, userId },
