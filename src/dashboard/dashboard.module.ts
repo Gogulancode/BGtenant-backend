@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { DashboardService } from "./dashboard.service";
+import { DashboardGuidanceService } from "./dashboard-guidance.service";
 import { DashboardController } from "./dashboard.controller";
 import { BusinessModule } from "../business/business.module";
 import { MetricsModule } from "../metrics/metrics.module";
@@ -22,6 +23,6 @@ import { PrismaModule } from "../prisma/prisma.module";
     PrismaModule,
   ],
   controllers: [DashboardController],
-  providers: [DashboardService],
+  providers: [DashboardService, DashboardGuidanceService],
 })
 export class DashboardModule {}

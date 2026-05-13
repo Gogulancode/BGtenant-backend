@@ -1,6 +1,7 @@
 import { Controller, Get, UseGuards } from "@nestjs/common";
 import { ApiOperation, ApiTags, ApiOkResponse } from "@nestjs/swagger";
 import { DashboardService } from "./dashboard.service";
+import { DashboardGuidanceService } from "./dashboard-guidance.service";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import {
   CurrentUser,
@@ -16,7 +17,10 @@ import { ApiTenantAuth } from "../common/docs/swagger.decorators";
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller("dashboard")
 export class DashboardController {
-  constructor(private readonly dashboardService: DashboardService) {}
+  constructor(
+    private readonly dashboardService: DashboardService,
+    private readonly dashboardGuidanceService: DashboardGuidanceService,
+  ) {}
 
   @ApiOperation({ summary: "Get consolidated dashboard summary" })
   @ApiOkResponse({ description: "Consolidated dashboard payload" })
@@ -24,5 +28,13 @@ export class DashboardController {
   @Roles(...TENANT_MEMBER_ROLES)
   async getSummary(@CurrentUser() user: UserContext) {
     return this.dashboardService.getSummary(user.userId, user.tenantId);
+  }
+
+  @ApiOperation({ summary: "Get coaching guidance for the current tenant" })
+  @ApiOkResponse({ description: "Tenant coaching guidance payload" })
+  @Get("guidance")
+  @Roles(...TENANT_MEMBER_ROLES)
+  async getGuidance(@CurrentUser() user: UserContext) {
+    return this.dashboardGuidanceService.getGuidance(user.userId, user.tenantId);
   }
 }

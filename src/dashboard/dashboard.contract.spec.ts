@@ -1,4 +1,6 @@
 import { DashboardService } from "./dashboard.service";
+import { DashboardController } from "./dashboard.controller";
+import { DashboardGuidanceService } from "./dashboard-guidance.service";
 import { BusinessService } from "../business/business.service";
 import { MetricsService } from "../metrics/metrics.service";
 import { OutcomesService } from "../outcomes/outcomes.service";
@@ -232,5 +234,45 @@ describe("Dashboard summary contract", () => {
         "tenant-contract",
       );
     });
+  });
+
+  it("delegates guidance requests to the guidance service with tenant context", async () => {
+    const guidanceService = {
+      getGuidance: jest.fn().mockResolvedValue({
+        summary: {
+          title: "Today's Focus",
+          message: "Keep one meaningful follow-up active today.",
+          tone: "encouraging",
+          healthScore: 75,
+        },
+        cards: [],
+        signals: [],
+        generatedAt: new Date("2026-05-13T00:00:00.000Z"),
+      }),
+    } as unknown as DashboardGuidanceService;
+
+    const controller = new DashboardController(
+      {} as DashboardService,
+      guidanceService,
+    );
+
+    await expect(
+      controller.getGuidance({
+        userId: "user-contract",
+        email: "owner@example.com",
+        role: "TENANT_ADMIN" as never,
+        tenantId: "tenant-contract",
+      }),
+    ).resolves.toMatchObject({
+      summary: {
+        title: "Today's Focus",
+        tone: "encouraging",
+      },
+    });
+
+    expect(guidanceService.getGuidance).toHaveBeenCalledWith(
+      "user-contract",
+      "tenant-contract",
+    );
   });
 });
