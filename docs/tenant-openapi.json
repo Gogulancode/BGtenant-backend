@@ -4,7 +4,6 @@
     "/api/v1/auth/register": {
       "post": {
         "operationId": "AuthController_register",
-        "summary": "Register new user",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -21,6 +20,7 @@
             "description": ""
           }
         },
+        "summary": "Register new user",
         "tags": [
           "Auth"
         ]
@@ -29,7 +29,6 @@
     "/api/v1/auth/login": {
       "post": {
         "operationId": "AuthController_login",
-        "summary": "Login user",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -46,6 +45,7 @@
             "description": ""
           }
         },
+        "summary": "Login user",
         "tags": [
           "Auth"
         ]
@@ -54,7 +54,6 @@
     "/api/v1/auth/refresh": {
       "post": {
         "operationId": "AuthController_refresh",
-        "summary": "Refresh access token",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -71,6 +70,7 @@
             "description": ""
           }
         },
+        "summary": "Refresh access token",
         "tags": [
           "Auth"
         ]
@@ -79,47 +79,46 @@
     "/api/v1/auth/logout": {
       "post": {
         "operationId": "AuthController_logout",
-        "summary": "Logout user",
         "parameters": [],
         "responses": {
           "200": {
             "description": ""
           }
         },
-        "tags": [
-          "Auth"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Logout user",
+        "tags": [
+          "Auth"
         ]
       }
     },
     "/api/v1/auth/mfa/enroll": {
       "post": {
         "operationId": "AuthController_enrollMfa",
-        "summary": "Start MFA enrollment",
         "parameters": [],
         "responses": {
           "201": {
             "description": ""
           }
         },
-        "tags": [
-          "Auth"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Start MFA enrollment",
+        "tags": [
+          "Auth"
         ]
       }
     },
     "/api/v1/auth/mfa/enable": {
       "post": {
         "operationId": "AuthController_enableMfa",
-        "summary": "Enable MFA",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -136,20 +135,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "Auth"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Enable MFA",
+        "tags": [
+          "Auth"
         ]
       }
     },
     "/api/v1/auth/mfa/disable": {
       "post": {
         "operationId": "AuthController_disableMfa",
-        "summary": "Disable MFA",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -166,20 +165,20 @@
             "description": ""
           }
         },
-        "tags": [
-          "Auth"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Disable MFA",
+        "tags": [
+          "Auth"
         ]
       }
     },
     "/api/v1/auth/accept-invite": {
       "post": {
         "operationId": "AuthController_acceptInvite",
-        "summary": "Accept tenant invitation",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -196,6 +195,7 @@
             "description": ""
           }
         },
+        "summary": "Accept tenant invitation",
         "tags": [
           "Auth"
         ]
@@ -204,28 +204,152 @@
     "/api/v1/auth/me": {
       "get": {
         "operationId": "AuthController_getMe",
-        "summary": "Get current user",
         "parameters": [],
         "responses": {
           "200": {
             "description": ""
           }
         },
-        "tags": [
-          "Auth"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get current user",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/notifications": {
+      "get": {
+        "operationId": "NotificationsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Notification list and unread count"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "List current user's notifications",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/unread-count": {
+      "get": {
+        "operationId": "NotificationsController_unreadCount",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Unread notification count"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get unread notification count",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/read-all": {
+      "patch": {
+        "operationId": "NotificationsController_markAllRead",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Number of notifications updated"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Mark all notifications as read",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/{id}/read": {
+      "patch": {
+        "operationId": "NotificationsController_markRead",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Updated notification"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Mark a notification as read",
+        "tags": [
+          "Notifications"
         ]
       }
     },
     "/api/v1/onboarding": {
       "get": {
-        "operationId": "OnboardingController_getProgress",
-        "summary": "Get onboarding progress",
         "description": "Returns the current onboarding progress for the authenticated tenant. Creates a default record if none exists.",
+        "operationId": "OnboardingController_getProgress",
         "parameters": [],
         "responses": {
           "200": {
@@ -251,19 +375,19 @@
             "description": "Tenant not found"
           }
         },
-        "tags": [
-          "Onboarding"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get onboarding progress",
+        "tags": [
+          "Onboarding"
         ]
       },
       "patch": {
-        "operationId": "OnboardingController_updateProgress",
-        "summary": "Update onboarding progress",
         "description": "Updates the onboarding progress for the authenticated tenant. Can advance steps, mark steps as completed, or mark the entire onboarding as complete.",
+        "operationId": "OnboardingController_updateProgress",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -299,21 +423,21 @@
             "description": "Tenant not found"
           }
         },
-        "tags": [
-          "Onboarding"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Update onboarding progress",
+        "tags": [
+          "Onboarding"
         ]
       }
     },
     "/api/v1/onboarding/profile": {
       "patch": {
-        "operationId": "OnboardingController_updateProfile",
-        "summary": "Update profile for onboarding (Step 1)",
         "description": "Updates the user profile with personal and business information during onboarding.",
+        "operationId": "OnboardingController_updateProfile",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -346,21 +470,21 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Onboarding"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Update profile for onboarding (Step 1)",
+        "tags": [
+          "Onboarding"
         ]
       }
     },
     "/api/v1/onboarding/business-identity": {
       "get": {
-        "operationId": "OnboardingController_getBusinessIdentity",
-        "summary": "Get business identity",
         "description": "Retrieves the business identity configuration for the tenant.",
+        "operationId": "OnboardingController_getBusinessIdentity",
         "parameters": [],
         "responses": {
           "200": {
@@ -383,19 +507,19 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Onboarding"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get business identity",
+        "tags": [
+          "Onboarding"
         ]
       },
       "put": {
-        "operationId": "OnboardingController_upsertBusinessIdentity",
-        "summary": "Update business identity (Step 2)",
         "description": "Creates or updates the business identity information including company type, industry, and turnover.",
+        "operationId": "OnboardingController_upsertBusinessIdentity",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -428,21 +552,21 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Onboarding"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Update business identity (Step 2)",
+        "tags": [
+          "Onboarding"
         ]
       }
     },
     "/api/v1/onboarding/sales-plan": {
       "get": {
-        "operationId": "OnboardingController_getSalesPlan",
-        "summary": "Get sales plan",
         "description": "Retrieves the sales plan with historical data and projections.",
+        "operationId": "OnboardingController_getSalesPlan",
         "parameters": [],
         "responses": {
           "200": {
@@ -465,19 +589,19 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Onboarding"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get sales plan",
+        "tags": [
+          "Onboarding"
         ]
       },
       "put": {
-        "operationId": "OnboardingController_upsertSalesPlan",
-        "summary": "Update sales plan (Step 3)",
         "description": "Creates or updates the sales plan with 3-year historical data, projected revenue, and monthly contribution percentages. Monthly targets are automatically calculated.",
+        "operationId": "OnboardingController_upsertSalesPlan",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -510,21 +634,21 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Onboarding"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Update sales plan (Step 3)",
+        "tags": [
+          "Onboarding"
         ]
       }
     },
     "/api/v1/onboarding/activity-setup": {
       "get": {
-        "operationId": "OnboardingController_getActivityConfiguration",
-        "summary": "Get activity configuration",
         "description": "Retrieves the activity tracking configuration for the tenant.",
+        "operationId": "OnboardingController_getActivityConfiguration",
         "parameters": [],
         "responses": {
           "200": {
@@ -547,19 +671,19 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Onboarding"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get activity configuration",
+        "tags": [
+          "Onboarding"
         ]
       },
       "put": {
-        "operationId": "OnboardingController_upsertActivityConfiguration",
-        "summary": "Update activity configuration (Step 4)",
         "description": "Creates or updates the activity tracking configuration including enabled categories, weekly goals, and reminder settings.",
+        "operationId": "OnboardingController_upsertActivityConfiguration",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -592,21 +716,21 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Onboarding"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Update activity configuration (Step 4)",
+        "tags": [
+          "Onboarding"
         ]
       }
     },
     "/api/v1/onboarding/sales-cycle": {
       "get": {
-        "operationId": "OnboardingController_getSalesCycleStages",
-        "summary": "Get sales cycle stages",
         "description": "Retrieves the configured sales cycle pipeline stages.",
+        "operationId": "OnboardingController_getSalesCycleStages",
         "parameters": [],
         "responses": {
           "200": {
@@ -629,19 +753,19 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Onboarding"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get sales cycle stages",
+        "tags": [
+          "Onboarding"
         ]
       },
       "put": {
-        "operationId": "OnboardingController_replaceSalesCycleStages",
-        "summary": "Update sales cycle stages (Step 5)",
         "description": "Replaces all sales cycle stages with the provided configuration. Minimum 2 stages, maximum 10 stages required.",
+        "operationId": "OnboardingController_replaceSalesCycleStages",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -674,21 +798,21 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Onboarding"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Update sales cycle stages (Step 5)",
+        "tags": [
+          "Onboarding"
         ]
       }
     },
     "/api/v1/onboarding/sales-cycle/defaults": {
       "post": {
-        "operationId": "OnboardingController_initializeDefaultSalesCycle",
-        "summary": "Initialize default sales cycle",
         "description": "Creates a default sales cycle pipeline with Lead, Qualified, Proposal, Negotiation, and Closed Won stages.",
+        "operationId": "OnboardingController_initializeDefaultSalesCycle",
         "parameters": [],
         "responses": {
           "201": {
@@ -711,21 +835,21 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Onboarding"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Initialize default sales cycle",
+        "tags": [
+          "Onboarding"
         ]
       }
     },
     "/api/v1/onboarding/achievement-stages": {
       "get": {
-        "operationId": "OnboardingController_getAchievementStages",
-        "summary": "Get achievement stages",
         "description": "Retrieves the configured achievement milestone stages.",
+        "operationId": "OnboardingController_getAchievementStages",
         "parameters": [],
         "responses": {
           "200": {
@@ -748,19 +872,19 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Onboarding"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get achievement stages",
+        "tags": [
+          "Onboarding"
         ]
       },
       "put": {
-        "operationId": "OnboardingController_replaceAchievementStages",
-        "summary": "Update achievement stages (Step 6)",
         "description": "Replaces all achievement stages with the provided configuration. Minimum 2 stages, maximum 10 stages required.",
+        "operationId": "OnboardingController_replaceAchievementStages",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -793,21 +917,21 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Onboarding"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Update achievement stages (Step 6)",
+        "tags": [
+          "Onboarding"
         ]
       }
     },
     "/api/v1/onboarding/subscription": {
       "get": {
-        "operationId": "OnboardingController_getSelectedSubscription",
-        "summary": "Get selected subscription",
         "description": "Retrieves the subscription plan selected during onboarding.",
+        "operationId": "OnboardingController_getSelectedSubscription",
         "parameters": [],
         "responses": {
           "200": {
@@ -830,19 +954,19 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Onboarding"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get selected subscription",
+        "tags": [
+          "Onboarding"
         ]
       },
       "put": {
-        "operationId": "OnboardingController_selectSubscription",
-        "summary": "Select subscription plan (Step 7)",
         "description": "Selects a subscription plan for the tenant. The actual subscription is created when onboarding is completed.",
+        "operationId": "OnboardingController_selectSubscription",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -875,21 +999,21 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Onboarding"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Select subscription plan (Step 7)",
+        "tags": [
+          "Onboarding"
         ]
       }
     },
     "/api/v1/onboarding/complete": {
       "post": {
-        "operationId": "OnboardingController_completeOnboarding",
-        "summary": "Complete onboarding (Step 8)",
         "description": "Marks the onboarding as complete. Validates that all required steps are completed before allowing completion. Creates the actual subscription based on the selected plan.",
+        "operationId": "OnboardingController_completeOnboarding",
         "parameters": [],
         "responses": {
           "200": {
@@ -915,20 +1039,20 @@
             "description": "Onboarding progress not found"
           }
         },
-        "tags": [
-          "Onboarding"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Complete onboarding (Step 8)",
+        "tags": [
+          "Onboarding"
         ]
       }
     },
     "/api/v1/users/me": {
       "get": {
         "operationId": "UserController_getProfile",
-        "summary": "Get current user profile",
         "parameters": [],
         "responses": {
           "200": {
@@ -963,18 +1087,18 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "User"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get current user profile",
+        "tags": [
+          "User"
         ]
       },
       "put": {
         "operationId": "UserController_updateProfile",
-        "summary": "Update user profile",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1019,20 +1143,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "User"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Update user profile",
+        "tags": [
+          "User"
         ]
       }
     },
     "/api/v1/users": {
       "get": {
         "operationId": "UserController_listTenantUsers",
-        "summary": "List users in my tenant (admin only)",
         "parameters": [
           {
             "name": "includeInactive",
@@ -1048,13 +1172,13 @@
             "required": false,
             "in": "query",
             "schema": {
+              "type": "string",
               "enum": [
                 "TENANT_ADMIN",
                 "MANAGER",
                 "STAFF",
                 "VIEWER"
-              ],
-              "type": "string"
+              ]
             }
           }
         ],
@@ -1093,18 +1217,18 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "User"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "List users in my tenant (admin only)",
+        "tags": [
+          "User"
         ]
       },
       "post": {
         "operationId": "UserController_inviteTenantUser",
-        "summary": "Invite new tenant user (TENANT_ADMIN)",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1153,20 +1277,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "User"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Invite new tenant user (TENANT_ADMIN)",
+        "tags": [
+          "User"
         ]
       }
     },
     "/api/v1/users/{id}/role": {
       "put": {
         "operationId": "UserController_updateTenantUserRole",
-        "summary": "Update tenant user role (TENANT_ADMIN)",
         "parameters": [
           {
             "name": "id",
@@ -1220,20 +1344,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "User"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Update tenant user role (TENANT_ADMIN)",
+        "tags": [
+          "User"
         ]
       }
     },
     "/api/v1/users/{id}/status": {
       "patch": {
         "operationId": "UserController_updateTenantUserStatus",
-        "summary": "Activate or deactivate tenant user (TENANT_ADMIN)",
         "parameters": [
           {
             "name": "id",
@@ -1287,20 +1411,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "User"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Activate or deactivate tenant user (TENANT_ADMIN)",
+        "tags": [
+          "User"
         ]
       }
     },
     "/api/v1/business/snapshot": {
       "post": {
         "operationId": "BusinessController_upsertSnapshot",
-        "summary": "Create or update business snapshot",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1326,18 +1450,18 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Business"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Create or update business snapshot",
+        "tags": [
+          "Business"
         ]
       },
       "get": {
         "operationId": "BusinessController_getSnapshot",
-        "summary": "Get business snapshot",
         "parameters": [],
         "responses": {
           "200": {
@@ -1353,20 +1477,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Business"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get business snapshot",
+        "tags": [
+          "Business"
         ]
       }
     },
     "/api/v1/business/nsm": {
       "get": {
         "operationId": "BusinessController_getNSM",
-        "summary": "Get suggested North Star Metric (NSM)",
         "parameters": [],
         "responses": {
           "200": {
@@ -1382,20 +1506,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Business"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get suggested North Star Metric (NSM)",
+        "tags": [
+          "Business"
         ]
       }
     },
     "/api/v1/business/summary": {
       "get": {
         "operationId": "BusinessController_getSummary",
-        "summary": "Get business summary for dashboard readiness",
         "parameters": [],
         "responses": {
           "200": {
@@ -1411,20 +1535,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Business"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get business summary for dashboard readiness",
+        "tags": [
+          "Business"
         ]
       }
     },
     "/api/v1/metrics": {
       "get": {
         "operationId": "MetricsController_getAllMetrics",
-        "summary": "Get all metrics with recent logs",
         "parameters": [
           {
             "name": "page",
@@ -1484,18 +1608,18 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Metrics"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get all metrics with recent logs",
+        "tags": [
+          "Metrics"
         ]
       },
       "post": {
         "operationId": "MetricsController_createMetric",
-        "summary": "Create new metric",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1521,20 +1645,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Metrics"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Create new metric",
+        "tags": [
+          "Metrics"
         ]
       }
     },
     "/api/v1/metrics/{id}/logs": {
       "post": {
         "operationId": "MetricsController_createLog",
-        "summary": "Create metric log entry",
         "parameters": [
           {
             "name": "id",
@@ -1569,18 +1693,18 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Metrics"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Create metric log entry",
+        "tags": [
+          "Metrics"
         ]
       },
       "get": {
         "operationId": "MetricsController_getLogs",
-        "summary": "List logs for a metric",
         "parameters": [
           {
             "name": "id",
@@ -1633,20 +1757,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Metrics"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "List logs for a metric",
+        "tags": [
+          "Metrics"
         ]
       }
     },
     "/api/v1/metrics/summary": {
       "get": {
         "operationId": "MetricsController_getSummary",
-        "summary": "Get metric summary for dashboard",
         "parameters": [],
         "responses": {
           "200": {
@@ -1662,20 +1786,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Metrics"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get metric summary for dashboard",
+        "tags": [
+          "Metrics"
         ]
       }
     },
     "/api/v1/metrics/{id}": {
       "get": {
         "operationId": "MetricsController_getMetric",
-        "summary": "Get a single metric",
         "parameters": [
           {
             "name": "id",
@@ -1700,18 +1824,18 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Metrics"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get a single metric",
+        "tags": [
+          "Metrics"
         ]
       },
       "put": {
         "operationId": "MetricsController_updateMetric",
-        "summary": "Update an existing metric",
         "parameters": [
           {
             "name": "id",
@@ -1746,18 +1870,18 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Metrics"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Update an existing metric",
+        "tags": [
+          "Metrics"
         ]
       },
       "delete": {
         "operationId": "MetricsController_deleteMetric",
-        "summary": "Delete a metric",
         "parameters": [
           {
             "name": "id",
@@ -1782,20 +1906,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Metrics"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Delete a metric",
+        "tags": [
+          "Metrics"
         ]
       }
     },
     "/api/v1/metrics/{id}/trend": {
       "get": {
         "operationId": "MetricsController_getTrend",
-        "summary": "Get metric trend data",
         "parameters": [
           {
             "name": "id",
@@ -1820,20 +1944,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Metrics"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get metric trend data",
+        "tags": [
+          "Metrics"
         ]
       }
     },
     "/api/v1/outcomes": {
       "get": {
         "operationId": "OutcomesController_getOutcomes",
-        "summary": "Get outcomes for current user",
         "parameters": [
           {
             "name": "weekStart",
@@ -1901,18 +2025,18 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Outcomes"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get outcomes for current user",
+        "tags": [
+          "Outcomes"
         ]
       },
       "post": {
         "operationId": "OutcomesController_createOutcome",
-        "summary": "Create new outcome",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1938,20 +2062,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Outcomes"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Create new outcome",
+        "tags": [
+          "Outcomes"
         ]
       }
     },
     "/api/v1/outcomes/{id}": {
       "put": {
         "operationId": "OutcomesController_updateOutcome",
-        "summary": "Update outcome",
         "parameters": [
           {
             "name": "id",
@@ -1986,18 +2110,18 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Outcomes"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Update outcome",
+        "tags": [
+          "Outcomes"
         ]
       },
       "delete": {
         "operationId": "OutcomesController_deleteOutcome",
-        "summary": "Delete outcome",
         "parameters": [
           {
             "name": "id",
@@ -2022,20 +2146,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Outcomes"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Delete outcome",
+        "tags": [
+          "Outcomes"
         ]
       }
     },
     "/api/v1/outcomes/carry-forward": {
       "post": {
         "operationId": "OutcomesController_carryForward",
-        "summary": "Carry forward missed outcomes to next week",
         "parameters": [],
         "responses": {
           "200": {
@@ -2051,20 +2175,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Outcomes"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Carry forward missed outcomes to next week",
+        "tags": [
+          "Outcomes"
         ]
       }
     },
     "/api/v1/outcomes/summary": {
       "get": {
         "operationId": "OutcomesController_getSummary",
-        "summary": "Get outcomes summary for dashboard cards",
         "parameters": [],
         "responses": {
           "200": {
@@ -2080,20 +2204,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Outcomes"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get outcomes summary for dashboard cards",
+        "tags": [
+          "Outcomes"
         ]
       }
     },
     "/api/v1/outcomes/completion-rate": {
       "get": {
         "operationId": "OutcomesController_getCompletionRate",
-        "summary": "Get completion rate trend for recent weeks",
         "parameters": [
           {
             "name": "weeks",
@@ -2118,31 +2242,89 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Outcomes"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get completion rate trend for recent weeks",
+        "tags": [
+          "Outcomes"
+        ]
+      }
+    },
+    "/api/v1/outcomes/weekly-summary": {
+      "get": {
+        "description": "Compare planned weekly outcomes vs completed outcomes. Uses Excel-style week calculation (same as Sales and Activities modules).",
+        "operationId": "OutcomesController_getWeeklySummary",
+        "parameters": [
+          {
+            "name": "year",
+            "required": false,
+            "in": "query",
+            "description": "Year for the summary (defaults to current year)",
+            "schema": {
+              "example": 2026,
+              "type": "number"
+            }
+          },
+          {
+            "name": "week",
+            "required": false,
+            "in": "query",
+            "description": "Week number (1-52, defaults to current week)",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Weekly summary with planned vs completed count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklySummaryResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get weekly outcomes summary",
+        "tags": [
+          "Outcomes"
         ]
       }
     },
     "/api/v1/reviews": {
       "get": {
         "operationId": "ReviewsController_getReviews",
-        "summary": "Get reviews",
         "parameters": [
           {
             "name": "type",
             "required": false,
             "in": "query",
             "schema": {
+              "type": "string",
               "enum": [
                 "Daily",
                 "Weekly"
-              ],
-              "type": "string"
+              ]
             }
           }
         ],
@@ -2160,18 +2342,18 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Reviews"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get reviews",
+        "tags": [
+          "Reviews"
         ]
       },
       "post": {
         "operationId": "ReviewsController_createReview",
-        "summary": "Create review",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2197,20 +2379,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Reviews"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Create review",
+        "tags": [
+          "Reviews"
         ]
       }
     },
     "/api/v1/reviews/summary": {
       "get": {
         "operationId": "ReviewsController_getSummary",
-        "summary": "Get review summary for dashboard",
         "parameters": [],
         "responses": {
           "200": {
@@ -2226,20 +2408,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Reviews"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get review summary for dashboard",
+        "tags": [
+          "Reviews"
         ]
       }
     },
     "/api/v1/sales/planning": {
       "get": {
         "operationId": "SalesController_getSalesPlanning",
-        "summary": "Get sales planning for year",
         "parameters": [
           {
             "name": "year",
@@ -2265,18 +2447,18 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Sales"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get sales planning for year",
+        "tags": [
+          "Sales"
         ]
       },
       "post": {
         "operationId": "SalesController_upsertSalesPlanning",
-        "summary": "Create or update sales planning",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2302,20 +2484,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Sales"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Create or update sales planning",
+        "tags": [
+          "Sales"
         ]
       }
     },
     "/api/v1/sales/tracker": {
       "get": {
         "operationId": "SalesController_getSalesTracker",
-        "summary": "Get sales tracker for month",
         "parameters": [
           {
             "name": "month",
@@ -2341,18 +2523,18 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Sales"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get sales tracker for month",
+        "tags": [
+          "Sales"
         ]
       },
       "post": {
         "operationId": "SalesController_upsertSalesTracker",
-        "summary": "Create or update sales tracker",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2378,20 +2560,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Sales"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Create or update sales tracker",
+        "tags": [
+          "Sales"
         ]
       }
     },
     "/api/v1/sales/summary": {
       "get": {
         "operationId": "SalesController_getSummary",
-        "summary": "Get sales dashboard summary",
         "parameters": [],
         "responses": {
           "200": {
@@ -2407,20 +2589,249 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Sales"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get sales dashboard summary",
+        "tags": [
+          "Sales"
+        ]
+      }
+    },
+    "/api/v1/sales/targets": {
+      "get": {
+        "operationId": "SalesController_getCurrentTargets",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Current period sales targets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentPeriodTargetsDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get current period targets with achievement data",
+        "tags": [
+          "Sales"
+        ]
+      }
+    },
+    "/api/v1/sales/targets/monthly": {
+      "get": {
+        "operationId": "SalesController_getMonthlyTargets",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Monthly targets breakdown",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MonthlyTargetDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get all monthly targets for the year",
+        "tags": [
+          "Sales"
+        ]
+      }
+    },
+    "/api/v1/sales/targets/weekly": {
+      "get": {
+        "operationId": "SalesController_getWeeklyTargets",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Weekly targets breakdown",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WeeklyTargetDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get all 52 weekly targets for the year",
+        "tags": [
+          "Sales"
+        ]
+      }
+    },
+    "/api/v1/sales/targets/week": {
+      "get": {
+        "operationId": "SalesController_getWeekTarget",
+        "parameters": [
+          {
+            "name": "week",
+            "required": true,
+            "in": "query",
+            "description": "Week number (1-52)",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Weekly target for specified week",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklyTargetDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get target for a specific week",
+        "tags": [
+          "Sales"
+        ]
+      }
+    },
+    "/api/v1/sales/weekly-summary": {
+      "get": {
+        "description": "Returns weekly sales performance for a range of weeks (default: last 6 weeks including current)",
+        "operationId": "SalesController_getWeeklySummary",
+        "parameters": [
+          {
+            "name": "year",
+            "required": false,
+            "in": "query",
+            "description": "Year (defaults to current year)",
+            "schema": {
+              "example": 2026,
+              "type": "number"
+            }
+          },
+          {
+            "name": "fromWeek",
+            "required": false,
+            "in": "query",
+            "description": "Starting week number (1-52)",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "toWeek",
+            "required": false,
+            "in": "query",
+            "description": "Ending week number (1-52)",
+            "schema": {
+              "example": 6,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Weekly summary trend with targets, achieved, and achievement stages",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklySummaryResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get weekly summary trend",
+        "tags": [
+          "Sales"
         ]
       }
     },
     "/api/v1/sales/trackers": {
       "get": {
         "operationId": "SalesController_getAllSalesTrackers",
-        "summary": "Get all sales trackers with pagination",
         "parameters": [
           {
             "name": "page",
@@ -2480,20 +2891,414 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Sales"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get all sales trackers with pagination",
+        "tags": [
+          "Sales"
+        ]
+      }
+    },
+    "/api/v1/sales/weekly-entry": {
+      "post": {
+        "operationId": "SalesController_createWeeklySalesEntry",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWeeklySalesEntryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Weekly sales entry saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklySalesEntryResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Log or update weekly sales achievement",
+        "tags": [
+          "Sales"
+        ]
+      },
+      "get": {
+        "operationId": "SalesController_getWeeklySalesEntry",
+        "parameters": [
+          {
+            "name": "year",
+            "required": true,
+            "in": "query",
+            "description": "Year",
+            "schema": {
+              "example": 2026,
+              "type": "number"
+            }
+          },
+          {
+            "name": "week",
+            "required": false,
+            "in": "query",
+            "description": "Week number (1-52)",
+            "schema": {
+              "example": 2,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Weekly sales entry with target comparison",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklySalesEntryResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get weekly sales entry for a specific week",
+        "tags": [
+          "Sales"
+        ]
+      }
+    },
+    "/api/v1/sales/prospects": {
+      "get": {
+        "operationId": "SalesProspectsController_list",
+        "parameters": [
+          {
+            "name": "month",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "2026-05",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "COLD",
+                "WARM",
+                "HOT",
+                "CONVERTED",
+                "REJECTED"
+              ]
+            }
+          },
+          {
+            "name": "reason",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "BUDGET",
+                "AUTHORITY",
+                "NEED",
+                "TIMELINE",
+                "AVAILABILITY",
+                "CLOSURE",
+                "OTHER"
+              ]
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated sales prospects"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "List sales prospects",
+        "tags": [
+          "Sales Prospects"
+        ]
+      },
+      "post": {
+        "operationId": "SalesProspectsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSalesProspectDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Sales prospect created"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Create a sales prospect",
+        "tags": [
+          "Sales Prospects"
+        ]
+      }
+    },
+    "/api/v1/sales/prospects/summary": {
+      "get": {
+        "operationId": "SalesProspectsController_summary",
+        "parameters": [
+          {
+            "name": "month",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "2026-05",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sales prospect summary"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get sales prospect summary",
+        "tags": [
+          "Sales Prospects"
+        ]
+      }
+    },
+    "/api/v1/sales/prospects/{id}": {
+      "get": {
+        "operationId": "SalesProspectsController_getById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sales prospect"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get a sales prospect",
+        "tags": [
+          "Sales Prospects"
+        ]
+      },
+      "patch": {
+        "operationId": "SalesProspectsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSalesProspectDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sales prospect updated"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Update a sales prospect",
+        "tags": [
+          "Sales Prospects"
+        ]
+      },
+      "delete": {
+        "operationId": "SalesProspectsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sales prospect deleted"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Delete a sales prospect",
+        "tags": [
+          "Sales Prospects"
         ]
       }
     },
     "/api/v1/activities": {
       "get": {
         "operationId": "ActivitiesController_getAllActivities",
-        "summary": "Get all activities with optional filters and pagination",
         "parameters": [
           {
             "name": "page",
@@ -2555,12 +3360,12 @@
             "description": "Filter by status",
             "schema": {
               "example": "Active",
+              "type": "string",
               "enum": [
                 "Active",
                 "Completed",
                 "Cancelled"
-              ],
-              "type": "string"
+              ]
             }
           },
           {
@@ -2570,12 +3375,12 @@
             "description": "Filter by priority",
             "schema": {
               "example": "High",
+              "type": "string",
               "enum": [
                 "Low",
                 "Medium",
                 "High"
-              ],
-              "type": "string"
+              ]
             }
           },
           {
@@ -2613,18 +3418,18 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Activities"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get all activities with optional filters and pagination",
+        "tags": [
+          "Activities"
         ]
       },
       "post": {
         "operationId": "ActivitiesController_createActivity",
-        "summary": "Create activity",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2650,20 +3455,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Activities"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Create activity",
+        "tags": [
+          "Activities"
         ]
       }
     },
     "/api/v1/activities/{id}": {
       "put": {
         "operationId": "ActivitiesController_updateActivity",
-        "summary": "Update activity",
         "parameters": [
           {
             "name": "id",
@@ -2698,18 +3503,18 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Activities"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Update activity",
+        "tags": [
+          "Activities"
         ]
       },
       "delete": {
         "operationId": "ActivitiesController_deleteActivity",
-        "summary": "Delete activity",
         "parameters": [
           {
             "name": "id",
@@ -2734,20 +3539,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Activities"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Delete activity",
+        "tags": [
+          "Activities"
         ]
       }
     },
     "/api/v1/activities/summary": {
       "get": {
         "operationId": "ActivitiesController_getSummary",
-        "summary": "Get activities summary for dashboard",
         "parameters": [],
         "responses": {
           "200": {
@@ -2763,20 +3568,78 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Activities"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get activities summary for dashboard",
+        "tags": [
+          "Activities"
+        ]
+      }
+    },
+    "/api/v1/activities/weekly-summary": {
+      "get": {
+        "description": "Compare planned weekly activity targets (from onboarding) vs actual logged activities. Uses Excel-style week calculation (same as Sales module).",
+        "operationId": "ActivitiesController_getWeeklySummary",
+        "parameters": [
+          {
+            "name": "year",
+            "required": false,
+            "in": "query",
+            "description": "Year for the summary (defaults to current year)",
+            "schema": {
+              "example": 2026,
+              "type": "number"
+            }
+          },
+          {
+            "name": "week",
+            "required": false,
+            "in": "query",
+            "description": "Week number (1-52, defaults to current week)",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Weekly summary with target vs actual per category",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklySummaryResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get weekly activity summary",
+        "tags": [
+          "Activities"
         ]
       }
     },
     "/api/v1/insights": {
       "get": {
         "operationId": "InsightsController_getInsights",
-        "summary": "Get user insights (momentum, flags, streaks)",
         "parameters": [],
         "responses": {
           "200": {
@@ -2807,20 +3670,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Insights"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get user insights (momentum, flags, streaks)",
+        "tags": [
+          "Insights"
         ]
       }
     },
     "/api/v1/insights/summary": {
       "get": {
         "operationId": "InsightsController_getSummary",
-        "summary": "Get dashboard-ready insight summary",
         "parameters": [],
         "responses": {
           "200": {
@@ -2867,20 +3730,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Insights"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get dashboard-ready insight summary",
+        "tags": [
+          "Insights"
         ]
       }
     },
     "/api/v1/insights/momentum": {
       "get": {
         "operationId": "InsightsController_getMomentum",
-        "summary": "Get focused momentum summary",
         "parameters": [],
         "responses": {
           "200": {
@@ -2911,20 +3774,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Insights"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get focused momentum summary",
+        "tags": [
+          "Insights"
         ]
       }
     },
     "/api/v1/insights/streak": {
       "get": {
         "operationId": "InsightsController_getStreak",
-        "summary": "Get streak health summary",
         "parameters": [],
         "responses": {
           "200": {
@@ -2955,20 +3818,77 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Insights"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get streak health summary",
+        "tags": [
+          "Insights"
+        ]
+      }
+    },
+    "/api/v1/insights/weekly-diagnostics": {
+      "get": {
+        "operationId": "InsightsController_getWeeklyDiagnostics",
+        "parameters": [
+          {
+            "name": "year",
+            "required": false,
+            "in": "query",
+            "description": "Year for the diagnostics (defaults to current year)",
+            "schema": {
+              "example": 2026,
+              "type": "number"
+            }
+          },
+          {
+            "name": "week",
+            "required": false,
+            "in": "query",
+            "description": "Week number (1-52, defaults to current week)",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rule-based diagnostics with actionable insights",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklyDiagnosticsResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get weekly diagnostics explaining performance changes",
+        "tags": [
+          "Insights"
         ]
       }
     },
     "/api/v1/settings": {
       "get": {
         "operationId": "SettingsController_getSettings",
-        "summary": "Get user settings",
         "parameters": [],
         "responses": {
           "200": {
@@ -2995,18 +3915,18 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Settings"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get user settings",
+        "tags": [
+          "Settings"
         ]
       },
       "patch": {
         "operationId": "SettingsController_updateSettings",
-        "summary": "Update personal settings",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3043,21 +3963,129 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Settings"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Update personal settings",
+        "tags": [
+          "Settings"
+        ]
+      }
+    },
+    "/api/v1/settings/business-setup": {
+      "get": {
+        "operationId": "SettingsController_getBusinessSetupChecklist",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Business setup checklist with completion stats",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "checklist_123",
+                    "tenantId": "tenant_123",
+                    "uspDefined": true,
+                    "uspValue": "We deliver results 50% faster",
+                    "menuCardDefined": false,
+                    "menuCardValue": null,
+                    "packagesDefined": false,
+                    "packagesValue": null,
+                    "customerSegmentDefined": true,
+                    "customerSegmentValue": "SMBs in tech industry",
+                    "completedSteps": 2,
+                    "totalSteps": 4,
+                    "completionPercent": 50
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get business setup checklist",
+        "tags": [
+          "Settings"
+        ]
+      },
+      "patch": {
+        "operationId": "SettingsController_updateBusinessSetupChecklist",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBusinessSetupChecklistDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated business setup checklist with completion stats",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "checklist_123",
+                    "tenantId": "tenant_123",
+                    "uspDefined": true,
+                    "uspValue": "We deliver results 50% faster",
+                    "menuCardDefined": false,
+                    "menuCardValue": null,
+                    "packagesDefined": false,
+                    "packagesValue": null,
+                    "customerSegmentDefined": true,
+                    "customerSegmentValue": "SMBs in tech industry",
+                    "completedSteps": 2,
+                    "totalSteps": 4,
+                    "completionPercent": 50
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Update business setup checklist",
+        "tags": [
+          "Settings"
         ]
       }
     },
     "/api/v1/templates/metrics": {
       "get": {
-        "operationId": "TemplatesController_getAllMetricTemplates",
-        "summary": "Get all metric templates",
         "description": "Returns all global metric templates. Templates are managed by Superadmin.",
+        "operationId": "TemplatesController_getAllMetricTemplates",
         "parameters": [],
         "responses": {
           "200": {
@@ -3090,21 +4118,21 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Templates"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get all metric templates",
+        "tags": [
+          "Templates"
         ]
       }
     },
     "/api/v1/templates/outcomes": {
       "get": {
-        "operationId": "TemplatesController_getAllOutcomeTemplates",
-        "summary": "Get all outcome templates",
         "description": "Returns all global outcome templates. Templates are managed by Superadmin.",
+        "operationId": "TemplatesController_getAllOutcomeTemplates",
         "parameters": [],
         "responses": {
           "200": {
@@ -3136,21 +4164,21 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Templates"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get all outcome templates",
+        "tags": [
+          "Templates"
         ]
       }
     },
     "/api/v1/templates/activities": {
       "get": {
-        "operationId": "TemplatesController_getAllActivityTemplates",
-        "summary": "Get all activity templates",
         "description": "Returns all global activity templates. Templates are managed by Superadmin.",
+        "operationId": "TemplatesController_getAllActivityTemplates",
         "parameters": [],
         "responses": {
           "200": {
@@ -3182,20 +4210,174 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Templates"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get all activity templates",
+        "tags": [
+          "Templates"
+        ]
+      }
+    },
+    "/api/v1/templates/metrics/{id}/apply": {
+      "post": {
+        "description": "Creates a new metric for the user based on the template. Optionally override the target.",
+        "operationId": "TemplatesController_applyMetricTemplate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The created metric",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "metric_123",
+                    "name": "Daily Sales Calls",
+                    "target": 10,
+                    "createdAt": "2025-11-15T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Apply a metric template",
+        "tags": [
+          "Templates"
+        ]
+      }
+    },
+    "/api/v1/templates/outcomes/{id}/apply": {
+      "post": {
+        "description": "Creates a new outcome for the user based on the template.",
+        "operationId": "TemplatesController_applyOutcomeTemplate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The created outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "outcome_123",
+                    "title": "Close 3 deals",
+                    "status": "Planned",
+                    "createdAt": "2025-11-15T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Apply an outcome template",
+        "tags": [
+          "Templates"
+        ]
+      }
+    },
+    "/api/v1/templates/activities/{id}/apply": {
+      "post": {
+        "description": "Creates a new activity for the user based on the template.",
+        "operationId": "TemplatesController_applyActivityTemplate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The created activity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "activity_123",
+                    "title": "Follow up with leads",
+                    "category": "Sales",
+                    "status": "Pending",
+                    "createdAt": "2025-11-15T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Apply an activity template",
+        "tags": [
+          "Templates"
         ]
       }
     },
     "/api/v1/support/tickets": {
       "post": {
         "operationId": "SupportController_createTicket",
-        "summary": "Create support ticket",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3221,18 +4403,18 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Support"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Create support ticket",
+        "tags": [
+          "Support"
         ]
       },
       "get": {
         "operationId": "SupportController_getAllTickets",
-        "summary": "Get all tickets (Admin only)",
         "parameters": [
           {
             "name": "page",
@@ -3292,20 +4474,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Support"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get all tickets (Admin only)",
+        "tags": [
+          "Support"
         ]
       }
     },
     "/api/v1/support/tickets/my": {
       "get": {
         "operationId": "SupportController_getMyTickets",
-        "summary": "Get my tickets",
         "parameters": [
           {
             "name": "page",
@@ -3365,20 +4547,56 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Support"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get my tickets",
+        "tags": [
+          "Support"
         ]
       }
     },
     "/api/v1/support/tickets/{id}": {
+      "get": {
+        "operationId": "SupportController_getTicket",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tenant-scoped ticket detail with comments"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get support ticket detail",
+        "tags": [
+          "Support"
+        ]
+      },
       "patch": {
         "operationId": "SupportController_updateTicketStatus",
-        "summary": "Update ticket status (Admin only)",
         "parameters": [
           {
             "name": "id",
@@ -3413,18 +4631,18 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Support"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Update ticket status (Admin only)",
+        "tags": [
+          "Support"
         ]
       },
       "delete": {
         "operationId": "SupportController_deleteTicket",
-        "summary": "Delete ticket (Admin only)",
         "parameters": [
           {
             "name": "id",
@@ -3449,20 +4667,97 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Support"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Delete ticket (Admin only)",
+        "tags": [
+          "Support"
+        ]
+      }
+    },
+    "/api/v1/support/tickets/{id}/comments": {
+      "post": {
+        "operationId": "SupportController_addTicketComment",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddTicketCommentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Support ticket comment created"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Add support ticket comment",
+        "tags": [
+          "Support"
+        ]
+      }
+    },
+    "/api/v1/reports/business-profile": {
+      "get": {
+        "operationId": "ReportsController_getBusinessProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Business profile report returned"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get one-page business profile report",
+        "tags": [
+          "Reports"
         ]
       }
     },
     "/api/v1/reports/generate": {
       "post": {
         "operationId": "ReportsController_generateReport",
-        "summary": "Generate PDF report (Weekly/Monthly)",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3488,20 +4783,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Reports"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Generate PDF report (Weekly/Monthly)",
+        "tags": [
+          "Reports"
         ]
       }
     },
     "/api/v1/performance/analytics": {
       "get": {
         "operationId": "PerformanceController_getAnalytics",
-        "summary": "Get performance analytics (top coaches, top/bottom SMEs)",
         "parameters": [],
         "responses": {
           "200": {
@@ -3517,20 +4812,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Performance"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get performance analytics (top coaches, top/bottom SMEs)",
+        "tags": [
+          "Performance"
         ]
       }
     },
     "/api/v1/sessions/my": {
       "get": {
         "operationId": "SessionsController_getMySessions",
-        "summary": "Get my active sessions",
         "parameters": [],
         "responses": {
           "200": {
@@ -3561,20 +4856,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Sessions"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get my active sessions",
+        "tags": [
+          "Sessions"
         ]
       }
     },
     "/api/v1/sessions/{id}": {
       "delete": {
         "operationId": "SessionsController_revokeSession",
-        "summary": "Revoke specific session (force logout)",
         "parameters": [
           {
             "name": "id",
@@ -3608,20 +4903,20 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Sessions"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Revoke specific session (force logout)",
+        "tags": [
+          "Sessions"
         ]
       }
     },
     "/api/v1/sessions/my/all": {
       "delete": {
         "operationId": "SessionsController_revokeAllMySessions",
-        "summary": "Revoke all my sessions except current",
         "parameters": [],
         "responses": {
           "200": {
@@ -3646,60 +4941,60 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Sessions"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Revoke all my sessions except current",
+        "tags": [
+          "Sessions"
         ]
       }
     },
     "/api/v1/ops/health": {
       "get": {
         "operationId": "OpsController_getHealth",
-        "summary": "Get system health status (public endpoint)",
         "parameters": [],
         "responses": {
           "200": {
             "description": ""
           }
         },
-        "tags": [
-          "Ops"
-        ],
         "security": [
           {
             "ops-service": []
           }
+        ],
+        "summary": "Get system health status (public endpoint)",
+        "tags": [
+          "Ops"
         ]
       }
     },
     "/api/v1/ops/environment": {
       "get": {
         "operationId": "OpsController_getEnvironment",
-        "summary": "Get runtime environment snapshot",
         "parameters": [],
         "responses": {
           "200": {
             "description": ""
           }
         },
-        "tags": [
-          "Ops"
-        ],
         "security": [
           {
             "ops-service": []
           }
+        ],
+        "summary": "Get runtime environment snapshot",
+        "tags": [
+          "Ops"
         ]
       }
     },
     "/api/v1/ops/telemetry": {
       "get": {
         "operationId": "OpsController_getTelemetry",
-        "summary": "Get telemetry overview for background jobs",
         "parameters": [],
         "responses": {
           "200": {
@@ -3713,20 +5008,20 @@
             }
           }
         },
-        "tags": [
-          "Ops"
-        ],
         "security": [
           {
             "ops-service": []
           }
+        ],
+        "summary": "Get telemetry overview for background jobs",
+        "tags": [
+          "Ops"
         ]
       }
     },
     "/api/v1/ops/insights-telemetry": {
       "get": {
         "operationId": "OpsController_getInsightsTelemetry",
-        "summary": "Get insights telemetry dashboard",
         "parameters": [],
         "responses": {
           "200": {
@@ -3740,20 +5035,20 @@
             }
           }
         },
-        "tags": [
-          "Ops"
-        ],
         "security": [
           {
             "ops-service": []
           }
+        ],
+        "summary": "Get insights telemetry dashboard",
+        "tags": [
+          "Ops"
         ]
       }
     },
     "/api/v1/ops/rate-limits": {
       "get": {
         "operationId": "OpsController_getRateLimits",
-        "summary": "Get tenant-aware rate limit overview",
         "parameters": [
           {
             "name": "windowMinutes",
@@ -3778,20 +5073,20 @@
             }
           }
         },
-        "tags": [
-          "Ops"
-        ],
         "security": [
           {
             "ops-service": []
           }
+        ],
+        "summary": "Get tenant-aware rate limit overview",
+        "tags": [
+          "Ops"
         ]
       }
     },
     "/api/v1/ops/audit-logs": {
       "get": {
         "operationId": "OpsController_getAuditLogs",
-        "summary": "Get recent structured audit logs",
         "parameters": [
           {
             "name": "page",
@@ -3876,20 +5171,20 @@
             }
           }
         },
-        "tags": [
-          "Ops"
-        ],
         "security": [
           {
             "ops-service": []
           }
+        ],
+        "summary": "Get recent structured audit logs",
+        "tags": [
+          "Ops"
         ]
       }
     },
     "/api/v1/dashboard/summary": {
       "get": {
         "operationId": "DashboardController_getSummary",
-        "summary": "Get consolidated dashboard summary",
         "parameters": [],
         "responses": {
           "200": {
@@ -3905,13 +5200,1492 @@
             "description": "Forbidden – insufficient role or tenant scope"
           }
         },
-        "tags": [
-          "Dashboard"
-        ],
         "security": [
           {
             "JWT-auth": []
           }
+        ],
+        "summary": "Get consolidated dashboard summary",
+        "tags": [
+          "Dashboard"
+        ]
+      }
+    },
+    "/api/v1/dashboard/guidance": {
+      "get": {
+        "operationId": "DashboardController_getGuidance",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Tenant coaching guidance payload"
+          },
+          "400": {
+            "description": "Bad Request – validation failed for payload or query parameters"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid JWT"
+          },
+          "403": {
+            "description": "Forbidden – insufficient role or tenant scope"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get coaching guidance for the current tenant",
+        "tags": [
+          "Dashboard"
+        ]
+      }
+    },
+    "/api/v1/superadmin/dashboard/summary": {
+      "get": {
+        "operationId": "SuperadminController_getDashboardSummary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get platform dashboard summary",
+        "tags": [
+          "Superadmin"
+        ]
+      }
+    },
+    "/api/v1/superadmin/tenants": {
+      "get": {
+        "operationId": "SuperadminController_getTenants",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all tenants with pagination and filters",
+        "tags": [
+          "Superadmin"
+        ]
+      },
+      "post": {
+        "operationId": "SuperadminController_createTenant",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new tenant",
+        "tags": [
+          "Superadmin"
+        ]
+      }
+    },
+    "/api/v1/superadmin/tenants/{id}": {
+      "get": {
+        "operationId": "SuperadminController_getTenantById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Tenant ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get tenant by ID",
+        "tags": [
+          "Superadmin"
+        ]
+      },
+      "patch": {
+        "operationId": "SuperadminController_updateTenant",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Tenant ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update tenant",
+        "tags": [
+          "Superadmin"
+        ]
+      },
+      "delete": {
+        "operationId": "SuperadminController_deleteTenant",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Tenant ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete tenant",
+        "tags": [
+          "Superadmin"
+        ]
+      }
+    },
+    "/api/v1/superadmin/tenants/{id}/activate": {
+      "patch": {
+        "operationId": "SuperadminController_activateTenant",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Tenant ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Activate tenant",
+        "tags": [
+          "Superadmin"
+        ]
+      }
+    },
+    "/api/v1/superadmin/tenants/{id}/deactivate": {
+      "patch": {
+        "operationId": "SuperadminController_deactivateTenant",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Tenant ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Deactivate tenant",
+        "tags": [
+          "Superadmin"
+        ]
+      }
+    },
+    "/api/v1/superadmin/tenants/{id}/subscription": {
+      "patch": {
+        "operationId": "SuperadminController_updateTenantSubscription",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Tenant ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update tenant subscription",
+        "tags": [
+          "Superadmin"
+        ]
+      }
+    },
+    "/api/v1/superadmin/tenants/{id}/reset-password": {
+      "post": {
+        "operationId": "SuperadminController_resetTenantAdminPassword",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Tenant ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Reset tenant admin password and return new credentials",
+        "tags": [
+          "Superadmin"
+        ]
+      }
+    },
+    "/api/v1/superadmin/tenants/{id}/stats": {
+      "get": {
+        "operationId": "SuperadminController_getTenantStats",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Tenant ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get tenant statistics",
+        "tags": [
+          "Superadmin"
+        ]
+      }
+    },
+    "/api/v1/superadmin/templates": {
+      "get": {
+        "operationId": "SuperadminController_getTemplates",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "scope",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all global templates",
+        "tags": [
+          "Superadmin"
+        ]
+      },
+      "post": {
+        "operationId": "SuperadminController_createTemplate",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new template",
+        "tags": [
+          "Superadmin"
+        ]
+      }
+    },
+    "/api/v1/superadmin/templates/{id}": {
+      "get": {
+        "operationId": "SuperadminController_getTemplateByIdSimple",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Template ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get template by ID (auto-detect type)",
+        "tags": [
+          "Superadmin"
+        ]
+      },
+      "patch": {
+        "operationId": "SuperadminController_updateTemplateSimple",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Template ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update template by ID (auto-detect type)",
+        "tags": [
+          "Superadmin"
+        ]
+      },
+      "delete": {
+        "operationId": "SuperadminController_deleteTemplateSimple",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Template ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete template by ID (auto-detect type)",
+        "tags": [
+          "Superadmin"
+        ]
+      }
+    },
+    "/api/v1/superadmin/templates/{type}/{id}": {
+      "get": {
+        "operationId": "SuperadminController_getTemplateById",
+        "parameters": [
+          {
+            "name": "type",
+            "required": true,
+            "in": "path",
+            "description": "Template type (metric, outcome, activity)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Template ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get template by ID and type",
+        "tags": [
+          "Superadmin"
+        ]
+      },
+      "patch": {
+        "operationId": "SuperadminController_updateTemplate",
+        "parameters": [
+          {
+            "name": "type",
+            "required": true,
+            "in": "path",
+            "description": "Template type",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Template ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update template",
+        "tags": [
+          "Superadmin"
+        ]
+      },
+      "delete": {
+        "operationId": "SuperadminController_deleteTemplate",
+        "parameters": [
+          {
+            "name": "type",
+            "required": true,
+            "in": "path",
+            "description": "Template type",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Template ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete template",
+        "tags": [
+          "Superadmin"
+        ]
+      }
+    },
+    "/api/v1/superadmin/support/tickets": {
+      "get": {
+        "operationId": "SuperadminController_getTickets",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "priority",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tenantId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List support tickets",
+        "tags": [
+          "Superadmin"
+        ]
+      }
+    },
+    "/api/v1/superadmin/support/tickets/{id}": {
+      "get": {
+        "operationId": "SuperadminController_getTicketById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Ticket ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get ticket by ID",
+        "tags": [
+          "Superadmin"
+        ]
+      }
+    },
+    "/api/v1/superadmin/support/tickets/{id}/status": {
+      "patch": {
+        "operationId": "SuperadminController_updateTicketStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Ticket ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update ticket status",
+        "tags": [
+          "Superadmin"
+        ]
+      }
+    },
+    "/api/v1/superadmin/audit/logs": {
+      "get": {
+        "operationId": "SuperadminController_getAuditLogs",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "tenantId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "module",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get audit logs",
+        "tags": [
+          "Superadmin"
+        ]
+      }
+    },
+    "/api/v1/superadmin/reports/tenants": {
+      "get": {
+        "operationId": "SuperadminController_getTenantReportSummary",
+        "parameters": [
+          {
+            "name": "tenantId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get tenant report summary",
+        "tags": [
+          "Superadmin"
+        ]
+      }
+    },
+    "/api/v1/superadmin/settings": {
+      "get": {
+        "operationId": "SuperadminController_getPlatformSettings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get platform settings",
+        "tags": [
+          "Superadmin"
+        ]
+      },
+      "patch": {
+        "operationId": "SuperadminController_updatePlatformSettings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update platform settings",
+        "tags": [
+          "Superadmin"
+        ]
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "operationId": "HealthController_check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The Health Check is successful\n\nApplication is alive",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    },
+                    "info": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "error": {
+                      "type": "object",
+                      "example": {},
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "details": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The Health Check is not successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "info": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "error": {
+                      "type": "object",
+                      "example": {
+                        "redis": {
+                          "status": "down",
+                          "message": "Could not connect"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "details": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up"
+                        },
+                        "redis": {
+                          "status": "down",
+                          "message": "Could not connect"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Basic health check (liveness probe)",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/api/v1/health/ready": {
+      "get": {
+        "operationId": "HealthController_readiness",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The Health Check is successful\n\nApplication is ready",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    },
+                    "info": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "error": {
+                      "type": "object",
+                      "example": {},
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "details": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The Health Check is not successful\n\nApplication is not ready",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "info": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "error": {
+                      "type": "object",
+                      "example": {
+                        "redis": {
+                          "status": "down",
+                          "message": "Could not connect"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "details": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up"
+                        },
+                        "redis": {
+                          "status": "down",
+                          "message": "Could not connect"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Readiness probe with database check",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/api/v1/health/detailed": {
+      "get": {
+        "operationId": "HealthController_detailed",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The Health Check is successful\n\nDetailed health information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    },
+                    "info": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "error": {
+                      "type": "object",
+                      "example": {},
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "details": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The Health Check is not successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "info": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "error": {
+                      "type": "object",
+                      "example": {
+                        "redis": {
+                          "status": "down",
+                          "message": "Could not connect"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "details": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up"
+                        },
+                        "redis": {
+                          "status": "down",
+                          "message": "Could not connect"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Detailed health status for monitoring",
+        "tags": [
+          "Health"
         ]
       }
     }
@@ -4318,6 +7092,35 @@
           }
         }
       },
+      "PainPointsDto": {
+        "type": "object",
+        "properties": {
+          "gettingCustomers": {
+            "type": "boolean",
+            "description": "Difficulty getting new customers"
+          },
+          "pricing": {
+            "type": "boolean",
+            "description": "Difficulty with pricing"
+          },
+          "negotiating": {
+            "type": "boolean",
+            "description": "Difficulty negotiating with customers"
+          },
+          "referrals": {
+            "type": "boolean",
+            "description": "Difficulty getting referrals"
+          },
+          "retaining": {
+            "type": "boolean",
+            "description": "Difficulty retaining customers"
+          },
+          "executingPlans": {
+            "type": "boolean",
+            "description": "Difficulty executing plans consistently"
+          }
+        }
+      },
       "UpdateProfileOnboardingDto": {
         "type": "object",
         "properties": {
@@ -4377,12 +7180,16 @@
                 "$ref": "#/components/schemas/SocialHandlesDto"
               }
             ]
+          },
+          "painPoints": {
+            "description": "Business challenges and pain points",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PainPointsDto"
+              }
+            ]
           }
-        },
-        "required": [
-          "name",
-          "businessType"
-        ]
+        }
       },
       "ProfileOnboardingResponseDto": {
         "type": "object",
@@ -4432,6 +7239,9 @@
           "socialHandles": {
             "$ref": "#/components/schemas/SocialHandlesDto"
           },
+          "painPoints": {
+            "$ref": "#/components/schemas/PainPointsDto"
+          },
           "updatedAt": {
             "format": "date-time",
             "type": "string"
@@ -4467,6 +7277,30 @@
               "NON_PROFIT",
               "COOPERATIVE",
               "OTHER"
+            ]
+          },
+          "customerType": {
+            "type": "string",
+            "enum": [
+              "B2B",
+              "B2C",
+              "BOTH"
+            ]
+          },
+          "registrationStatus": {
+            "type": "string",
+            "enum": [
+              "REGISTERED",
+              "UNREGISTERED",
+              "IN_PROGRESS"
+            ]
+          },
+          "offeringType": {
+            "type": "string",
+            "enum": [
+              "PRODUCT",
+              "SERVICE",
+              "BOTH"
             ]
           },
           "industry": {
@@ -4526,6 +7360,24 @@
           "description": {
             "type": "string"
           },
+          "businessAge": {
+            "type": "number"
+          },
+          "usp": {
+            "type": "string"
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "offerings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string"
@@ -4563,6 +7415,36 @@
               "OTHER"
             ],
             "example": "LLC"
+          },
+          "customerType": {
+            "type": "string",
+            "description": "Primary customer segment",
+            "enum": [
+              "B2B",
+              "B2C",
+              "BOTH"
+            ],
+            "example": "B2B"
+          },
+          "registrationStatus": {
+            "type": "string",
+            "description": "Business registration status",
+            "enum": [
+              "REGISTERED",
+              "UNREGISTERED",
+              "IN_PROGRESS"
+            ],
+            "example": "REGISTERED"
+          },
+          "offeringType": {
+            "type": "string",
+            "description": "Whether the business sells products, services, or both",
+            "enum": [
+              "PRODUCT",
+              "SERVICE",
+              "BOTH"
+            ],
+            "example": "SERVICE"
           },
           "industry": {
             "type": "string",
@@ -4636,6 +7518,40 @@
             "description": "Brief description of the business",
             "example": "We provide innovative software solutions for SMBs.",
             "maxLength": 1000
+          },
+          "businessAge": {
+            "type": "number",
+            "description": "Years in business",
+            "example": 5
+          },
+          "usp": {
+            "type": "string",
+            "description": "Unique Selling Proposition",
+            "example": "We deliver results 50% faster than competitors.",
+            "maxLength": 500
+          },
+          "keywords": {
+            "description": "Business keywords/tags",
+            "example": [
+              "software",
+              "consulting",
+              "cloud"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "offerings": {
+            "description": "Named products or services offered by the business",
+            "example": [
+              "Sales excellence workshop",
+              "Business owner review"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -4709,6 +7625,42 @@
               "type": "number"
             }
           },
+          "averageTicketSize": {
+            "type": "number",
+            "example": 25000
+          },
+          "conversionRatio": {
+            "type": "number",
+            "example": 20
+          },
+          "existingCustomerContribution": {
+            "type": "number",
+            "example": 40
+          },
+          "newCustomerContribution": {
+            "type": "number",
+            "example": 60
+          },
+          "monthlyOrderTargets": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "monthlyLeadTargets": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "existingCustomerTarget": {
+            "type": "number",
+            "example": 600000
+          },
+          "newCustomerTarget": {
+            "type": "number",
+            "example": 900000
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string"
@@ -4724,6 +7676,14 @@
           "projectedYearValue",
           "monthlyContribution",
           "monthlyTargets",
+          "averageTicketSize",
+          "conversionRatio",
+          "existingCustomerContribution",
+          "newCustomerContribution",
+          "monthlyOrderTargets",
+          "monthlyLeadTargets",
+          "existingCustomerTarget",
+          "newCustomerTarget",
           "createdAt",
           "updatedAt"
         ]
@@ -4771,11 +7731,98 @@
             "items": {
               "type": "number"
             }
+          },
+          "averageTicketSize": {
+            "type": "number",
+            "description": "Average ticket size / average transaction size",
+            "example": 25000
+          },
+          "conversionRatio": {
+            "type": "number",
+            "description": "Lead-to-order conversion ratio percentage",
+            "example": 20
+          },
+          "existingCustomerContribution": {
+            "type": "number",
+            "description": "Existing customer contribution percentage",
+            "example": 40
+          },
+          "newCustomerContribution": {
+            "type": "number",
+            "description": "New customer contribution percentage",
+            "example": 60
           }
         },
         "required": [
           "projectedYearValue",
-          "monthlyContribution"
+          "monthlyContribution",
+          "averageTicketSize",
+          "conversionRatio",
+          "existingCustomerContribution",
+          "newCustomerContribution"
+        ]
+      },
+      "ActivityTemplateDto": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "example": "Creating weekly social media content"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ],
+            "example": "HIGH"
+          },
+          "weeklyGoal": {
+            "type": "number",
+            "example": 3
+          },
+          "reminderDays": {
+            "example": [
+              1,
+              3,
+              5
+            ],
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "measurability": {
+            "type": "string",
+            "example": "Increase or decrease in followers, views, likes, comments, and shares"
+          },
+          "impact": {
+            "type": "string",
+            "example": "Generating Leads"
+          },
+          "relevance": {
+            "type": "string",
+            "enum": [
+              "PRODUCT",
+              "SERVICE",
+              "BOTH"
+            ],
+            "example": "BOTH"
+          },
+          "enabled": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "category",
+          "priority",
+          "weeklyGoal",
+          "reminderDays",
+          "measurability",
+          "impact",
+          "relevance"
         ]
       },
       "ActivityConfigurationResponseDto": {
@@ -4812,6 +7859,12 @@
             "type": "array",
             "items": {
               "type": "number"
+            }
+          },
+          "activities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActivityTemplateDto"
             }
           },
           "createdAt": {
@@ -4884,7 +7937,7 @@
             "default": true
           },
           "reminderDays": {
-            "description": "Days of the week to send reminders (1=Mon, 7=Sun)",
+            "description": "Days of the week to send reminders (0=Sun, 6=Sat)",
             "example": [
               1,
               3,
@@ -4898,6 +7951,13 @@
             "type": "array",
             "items": {
               "type": "number"
+            }
+          },
+          "activities": {
+            "description": "Selected activity templates with measurability and impact metadata",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActivityTemplateDto"
             }
           }
         }
@@ -5235,6 +8295,12 @@
               "Startup",
               "MSME"
             ]
+          },
+          "socialHandles": {
+            "$ref": "#/components/schemas/SocialHandlesDto"
+          },
+          "painPoints": {
+            "$ref": "#/components/schemas/PainPointsDto"
           }
         }
       },
@@ -5400,6 +8466,39 @@
           }
         }
       },
+      "WeeklySummaryResponseDto": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "number",
+            "description": "Year of the summary",
+            "example": 2026
+          },
+          "week": {
+            "type": "number",
+            "description": "Week number (1-52)",
+            "example": 1
+          },
+          "items": {
+            "description": "Items per category with target vs actual",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WeeklySummaryItemDto"
+            }
+          },
+          "overallCompletionPercent": {
+            "type": "number",
+            "description": "Overall completion percentage across all categories",
+            "example": 65.5
+          }
+        },
+        "required": [
+          "year",
+          "week",
+          "items",
+          "overallCompletionPercent"
+        ]
+      },
       "CreateReviewDto": {
         "type": "object",
         "properties": {
@@ -5482,6 +8581,389 @@
           "month"
         ]
       },
+      "CurrentPeriodTargetsDto": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "number",
+            "example": 2026
+          },
+          "currentMonth": {
+            "type": "number",
+            "example": 1
+          },
+          "currentWeek": {
+            "type": "number",
+            "example": 1
+          },
+          "monthlyTarget": {
+            "type": "number",
+            "example": 100000
+          },
+          "weeklyTarget": {
+            "type": "number",
+            "example": 20000
+          },
+          "achievedThisMonth": {
+            "type": "number",
+            "example": 15000
+          },
+          "achievedThisWeek": {
+            "type": "number",
+            "example": 5000
+          },
+          "monthlyAchievementPercent": {
+            "type": "number",
+            "example": 15
+          },
+          "weeklyAchievementPercent": {
+            "type": "number",
+            "example": 25
+          },
+          "daysRemainingInWeek": {
+            "type": "number",
+            "example": 3
+          },
+          "weeksRemainingInMonth": {
+            "type": "number",
+            "example": 2
+          }
+        },
+        "required": [
+          "year",
+          "currentMonth",
+          "currentWeek",
+          "monthlyTarget",
+          "weeklyTarget",
+          "achievedThisMonth",
+          "achievedThisWeek",
+          "monthlyAchievementPercent",
+          "weeklyAchievementPercent",
+          "daysRemainingInWeek",
+          "weeksRemainingInMonth"
+        ]
+      },
+      "MonthlyTargetDto": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "number",
+            "example": 1
+          },
+          "monthName": {
+            "type": "string",
+            "example": "January"
+          },
+          "contributionPercent": {
+            "type": "number",
+            "example": 8.33
+          },
+          "targetValue": {
+            "type": "number",
+            "example": 100000
+          },
+          "weeksInMonth": {
+            "type": "number",
+            "example": 5
+          }
+        },
+        "required": [
+          "month",
+          "monthName",
+          "contributionPercent",
+          "targetValue",
+          "weeksInMonth"
+        ]
+      },
+      "WeeklyTargetDto": {
+        "type": "object",
+        "properties": {
+          "weekNumber": {
+            "type": "number",
+            "example": 1
+          },
+          "month": {
+            "type": "number",
+            "example": 1
+          },
+          "monthName": {
+            "type": "string",
+            "example": "January"
+          },
+          "weekInMonth": {
+            "type": "number",
+            "example": 1
+          },
+          "weeklyTarget": {
+            "type": "number",
+            "example": 20000
+          },
+          "cumulativeTarget": {
+            "type": "number",
+            "example": 20000
+          }
+        },
+        "required": [
+          "weekNumber",
+          "month",
+          "monthName",
+          "weekInMonth",
+          "weeklyTarget",
+          "cumulativeTarget"
+        ]
+      },
+      "WeeklySummaryItemDto": {
+        "type": "object",
+        "properties": {
+          "week": {
+            "type": "number",
+            "example": 1
+          },
+          "target": {
+            "type": "number",
+            "example": 20000
+          },
+          "achieved": {
+            "type": "number",
+            "example": 15000
+          },
+          "achievementPercent": {
+            "type": "number",
+            "example": 75
+          },
+          "stage": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AchievementStageDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "week",
+          "target",
+          "achieved",
+          "achievementPercent"
+        ]
+      },
+      "CreateWeeklySalesEntryDto": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "number",
+            "example": 2026,
+            "description": "Year"
+          },
+          "week": {
+            "type": "number",
+            "example": 2,
+            "description": "Week number (1-52)"
+          },
+          "achieved": {
+            "type": "number",
+            "example": 150000,
+            "description": "Amount achieved this week"
+          },
+          "orders": {
+            "type": "number",
+            "example": 5,
+            "description": "Number of orders/deals closed"
+          },
+          "notes": {
+            "type": "string",
+            "example": "Closed ABC Corp deal",
+            "description": "Optional notes"
+          }
+        },
+        "required": [
+          "year",
+          "week",
+          "achieved"
+        ]
+      },
+      "WeeklySalesEntryResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "year": {
+            "type": "number"
+          },
+          "week": {
+            "type": "number"
+          },
+          "achieved": {
+            "type": "number"
+          },
+          "orders": {
+            "type": "number"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "target": {
+            "type": "number"
+          },
+          "achievementPercent": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "year",
+          "week",
+          "achieved",
+          "target",
+          "achievementPercent",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateSalesProspectDto": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "example": "2026-05"
+          },
+          "firstCallAt": {
+            "type": "string",
+            "example": "2026-05-06"
+          },
+          "prospectName": {
+            "type": "string",
+            "example": "Acme Industries"
+          },
+          "mobileNumber": {
+            "type": "string",
+            "example": "+91 98765 43210"
+          },
+          "offeringType": {
+            "type": "string",
+            "example": "Sales Excellence Workshop"
+          },
+          "proposalValue": {
+            "type": "number",
+            "example": 150000
+          },
+          "referralSource": {
+            "type": "string",
+            "example": "Referral"
+          },
+          "lastFollowUpAt": {
+            "type": "string",
+            "example": "2026-05-10"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "COLD",
+              "WARM",
+              "HOT",
+              "CONVERTED",
+              "REJECTED"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "BUDGET",
+              "AUTHORITY",
+              "NEED",
+              "TIMELINE",
+              "AVAILABILITY",
+              "CLOSURE",
+              "OTHER"
+            ]
+          },
+          "remarks": {
+            "type": "string",
+            "example": "Asked to follow up next week."
+          }
+        },
+        "required": [
+          "month",
+          "prospectName"
+        ]
+      },
+      "UpdateSalesProspectDto": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "example": "2026-05"
+          },
+          "firstCallAt": {
+            "type": "string",
+            "example": "2026-05-06"
+          },
+          "prospectName": {
+            "type": "string",
+            "example": "Acme Industries"
+          },
+          "mobileNumber": {
+            "type": "string",
+            "example": "+91 98765 43210"
+          },
+          "offeringType": {
+            "type": "string",
+            "example": "Sales Excellence Workshop"
+          },
+          "proposalValue": {
+            "type": "number",
+            "example": 150000
+          },
+          "referralSource": {
+            "type": "string",
+            "example": "Referral"
+          },
+          "lastFollowUpAt": {
+            "type": "string",
+            "example": "2026-05-10"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "COLD",
+              "WARM",
+              "HOT",
+              "CONVERTED",
+              "REJECTED"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "BUDGET",
+              "AUTHORITY",
+              "NEED",
+              "TIMELINE",
+              "AVAILABILITY",
+              "CLOSURE",
+              "OTHER"
+            ]
+          },
+          "remarks": {
+            "type": "string",
+            "example": "Asked to follow up next week."
+          }
+        }
+      },
       "CreateActivityDto": {
         "type": "object",
         "properties": {
@@ -5533,6 +9015,108 @@
           }
         }
       },
+      "DiagnosticItemDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Type of diagnostic (SALES, ACTIVITY, or OUTCOME)",
+            "enum": [
+              "SALES",
+              "ACTIVITY",
+              "OUTCOME"
+            ],
+            "example": "SALES"
+          },
+          "level": {
+            "type": "string",
+            "description": "Severity level (SUCCESS, WARNING, or CRITICAL)",
+            "enum": [
+              "SUCCESS",
+              "WARNING",
+              "CRITICAL"
+            ],
+            "example": "WARNING"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable diagnostic message",
+            "example": "Activity levels are healthy, but conversions are low. Review lead quality."
+          }
+        },
+        "required": [
+          "type",
+          "level",
+          "message"
+        ]
+      },
+      "DiagnosticsSummaryDto": {
+        "type": "object",
+        "properties": {
+          "salesAchievementPercent": {
+            "type": "number",
+            "description": "Sales achievement percentage for the week",
+            "example": 75.5
+          },
+          "activityCompletionPercent": {
+            "type": "number",
+            "description": "Activity completion percentage for the week",
+            "example": 85
+          },
+          "outcomeCompletionPercent": {
+            "type": "number",
+            "description": "Outcome completion percentage for the week",
+            "example": 60
+          },
+          "momentumEffect": {
+            "type": "number",
+            "description": "Momentum effect score (-10 to +10)",
+            "example": 2
+          }
+        },
+        "required": [
+          "salesAchievementPercent",
+          "activityCompletionPercent",
+          "outcomeCompletionPercent",
+          "momentumEffect"
+        ]
+      },
+      "WeeklyDiagnosticsResponseDto": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "number",
+            "description": "Year of the diagnostics",
+            "example": 2026
+          },
+          "week": {
+            "type": "number",
+            "description": "Week number (1-52)",
+            "example": 1
+          },
+          "diagnostics": {
+            "description": "Array of diagnostic messages based on rule engine",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DiagnosticItemDto"
+            }
+          },
+          "summary": {
+            "description": "Summary of key performance metrics",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DiagnosticsSummaryDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "year",
+          "week",
+          "diagnostics",
+          "summary"
+        ]
+      },
       "UpdateSettingsDto": {
         "type": "object",
         "properties": {
@@ -5550,6 +9134,47 @@
             "type": "boolean",
             "description": "Opt-in for push notifications",
             "default": true
+          }
+        }
+      },
+      "UpdateBusinessSetupChecklistDto": {
+        "type": "object",
+        "properties": {
+          "uspDefined": {
+            "type": "boolean",
+            "description": "USP defined step completed"
+          },
+          "uspValue": {
+            "type": "string",
+            "description": "USP value",
+            "maxLength": 500
+          },
+          "menuCardDefined": {
+            "type": "boolean",
+            "description": "Menu card defined step completed"
+          },
+          "menuCardValue": {
+            "type": "string",
+            "description": "Menu card description",
+            "maxLength": 2000
+          },
+          "packagesDefined": {
+            "type": "boolean",
+            "description": "Packages defined step completed"
+          },
+          "packagesValue": {
+            "type": "string",
+            "description": "Packages description",
+            "maxLength": 2000
+          },
+          "customerSegmentDefined": {
+            "type": "boolean",
+            "description": "Customer segment defined step completed"
+          },
+          "customerSegmentValue": {
+            "type": "string",
+            "description": "Customer segment description",
+            "maxLength": 1000
           }
         }
       },
@@ -5583,6 +9208,21 @@
         },
         "required": [
           "subject",
+          "message"
+        ]
+      },
+      "AddTicketCommentDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Comment to add to the support ticket thread",
+            "minLength": 1,
+            "maxLength": 1000,
+            "example": "Thanks, I can reproduce this issue now."
+          }
+        },
+        "required": [
           "message"
         ]
       },
