@@ -27,7 +27,9 @@ describe("SalesService summary validation", () => {
         Promise.all(operations),
       ),
     };
-    salesTargetsService = new SalesTargetsService(prisma as unknown as PrismaService);
+    salesTargetsService = new SalesTargetsService(
+      prisma as unknown as PrismaService,
+    );
     service = new SalesService(
       prisma as unknown as PrismaService,
       salesTargetsService,
@@ -120,5 +122,131 @@ describe("SalesService summary validation", () => {
     });
     expect(summary.validation.dailyTracker.status).toBe("MISSING");
     expect(summary.validation.planVsActual.status).toBe("OFF_TRACK");
+  });
+});
+
+describe("SalesService weekly sales entry", () => {
+  it("returns target, percent, and status after creating weekly sales", async () => {
+    const entry = {
+      id: "weekly-entry-1",
+      userId,
+      tenantId,
+      year: 2026,
+      week: 20,
+      achieved: 15000,
+      orders: 3,
+      notes: "Closed two follow-ups",
+      createdAt: new Date("2026-05-13T00:00:00.000Z"),
+      updatedAt: new Date("2026-05-13T00:00:00.000Z"),
+    };
+    const prisma = {
+      weeklySalesEntry: {
+        findUnique: jest
+          .fn()
+          .mockResolvedValueOnce(null)
+          .mockResolvedValueOnce(entry),
+        create: jest.fn().mockResolvedValue(entry),
+      },
+    };
+    const targets = {
+      getWeeklyTargetForWeek: jest
+        .fn()
+        .mockResolvedValue({ weeklyTarget: 20000 }),
+    };
+    const service = new SalesService(
+      prisma as unknown as PrismaService,
+      targets as unknown as SalesTargetsService,
+    );
+
+    const result = await service.createWeeklySalesEntry(userId, tenantId, {
+      year: 2026,
+      week: 20,
+      achieved: 15000,
+      orders: 3,
+      notes: "Closed two follow-ups",
+    });
+
+    expect(prisma.weeklySalesEntry.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        tenantId,
+        userId,
+        year: 2026,
+        week: 20,
+        achieved: 15000,
+      }),
+    });
+    expect(result).toMatchObject({
+      id: "weekly-entry-1",
+      achieved: 15000,
+      orders: 3,
+      target: 20000,
+      achievementPercent: 75,
+      status: "below",
+    });
+  });
+
+  it("returns target, percent, and status after updating weekly sales", async () => {
+    const existing = {
+      id: "weekly-entry-1",
+      userId,
+      tenantId,
+      year: 2026,
+      week: 20,
+      achieved: 9000,
+      orders: 1,
+      notes: null,
+      createdAt: new Date("2026-05-12T00:00:00.000Z"),
+      updatedAt: new Date("2026-05-12T00:00:00.000Z"),
+    };
+    const updated = {
+      ...existing,
+      achieved: 25000,
+      orders: 4,
+      notes: "Added a larger order",
+      updatedAt: new Date("2026-05-13T00:00:00.000Z"),
+    };
+    const prisma = {
+      weeklySalesEntry: {
+        findUnique: jest
+          .fn()
+          .mockResolvedValueOnce(existing)
+          .mockResolvedValueOnce(updated),
+        update: jest.fn().mockResolvedValue(updated),
+      },
+    };
+    const targets = {
+      getWeeklyTargetForWeek: jest
+        .fn()
+        .mockResolvedValue({ weeklyTarget: 20000 }),
+    };
+    const service = new SalesService(
+      prisma as unknown as PrismaService,
+      targets as unknown as SalesTargetsService,
+    );
+
+    const result = await service.createWeeklySalesEntry(userId, tenantId, {
+      year: 2026,
+      week: 20,
+      achieved: 25000,
+      orders: 4,
+      notes: "Added a larger order",
+    });
+
+    expect(prisma.weeklySalesEntry.update).toHaveBeenCalledWith({
+      where: { id: "weekly-entry-1" },
+      data: {
+        achieved: 25000,
+        orders: 4,
+        notes: "Added a larger order",
+      },
+    });
+    expect(result).toMatchObject({
+      id: "weekly-entry-1",
+      achieved: 25000,
+      orders: 4,
+      target: 20000,
+      achievementPercent: 125,
+      status: "exceeded",
+    });
   });
 });

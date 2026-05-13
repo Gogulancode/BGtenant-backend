@@ -169,6 +169,8 @@ describe("DashboardGuidanceService", () => {
           id: "sales-gap-followups",
           source: "sales",
           priority: "high",
+          title: expect.stringContaining("left this week"),
+          message: expect.stringContaining("still pending"),
           impactMetric: "sales_gap",
           why: expect.any(String),
           actionRoute: "/sales",

@@ -164,7 +164,9 @@ export class SalesService {
       targets.monthlyTarget > 0
         ? targets.monthlyAchievementPercent
         : tracker?.target
-          ? Number((((tracker.achieved ?? 0) / tracker.target) * 100).toFixed(2))
+          ? Number(
+              (((tracker.achieved ?? 0) / tracker.target) * 100).toFixed(2),
+            )
           : 0;
 
     return {
@@ -423,7 +425,13 @@ export class SalesService {
   async createWeeklySalesEntry(
     userId: string,
     tenantId: string | null | undefined,
-    data: { year: number; week: number; achieved: number; orders?: number; notes?: string },
+    data: {
+      year: number;
+      week: number;
+      achieved: number;
+      orders?: number;
+      notes?: string;
+    },
   ) {
     const scopedTenantId = assertTenantContext(tenantId);
 
@@ -440,8 +448,7 @@ export class SalesService {
     });
 
     if (existing) {
-      // Update existing entry
-      return this.prisma.weeklySalesEntry.update({
+      await this.prisma.weeklySalesEntry.update({
         where: { id: existing.id },
         data: {
           achieved: data.achieved,
@@ -449,10 +456,16 @@ export class SalesService {
           notes: data.notes,
         },
       });
+
+      return this.getWeeklySalesEntry(
+        userId,
+        scopedTenantId,
+        data.year,
+        data.week,
+      );
     }
 
-    // Create new entry
-    return this.prisma.weeklySalesEntry.create({
+    await this.prisma.weeklySalesEntry.create({
       data: {
         userId,
         tenantId: scopedTenantId,
@@ -463,6 +476,13 @@ export class SalesService {
         notes: data.notes,
       },
     });
+
+    return this.getWeeklySalesEntry(
+      userId,
+      scopedTenantId,
+      data.year,
+      data.week,
+    );
   }
 
   async getWeeklySalesEntry(
@@ -531,12 +551,14 @@ export class SalesService {
     });
 
     // Get all weekly targets
-    const weeklyTargets = await this.salesTargetsService.getWeeklyTargets(tenantId);
+    const weeklyTargets =
+      await this.salesTargetsService.getWeeklyTargets(tenantId);
 
     // Map entries with targets
     return entries.map((entry) => {
       const target = weeklyTargets[entry.week - 1]?.weeklyTarget ?? 0;
-      const achievementPercent = target > 0 ? (entry.achieved / target) * 100 : 0;
+      const achievementPercent =
+        target > 0 ? (entry.achieved / target) * 100 : 0;
 
       let status: "exceeded" | "achieved" | "below" = "below";
       if (achievementPercent >= 100) status = "exceeded";

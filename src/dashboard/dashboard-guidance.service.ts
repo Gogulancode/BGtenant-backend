@@ -8,9 +8,18 @@ import {
   GuidanceSignalDto,
 } from "./dto/dashboard-guidance.dto";
 
+const WEEKS_PER_MONTH = [5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4];
+
 function percent(numerator: number, denominator: number): number {
   if (!denominator || denominator <= 0) return 0;
-  return Math.min(100, Math.max(0, Math.round((numerator / denominator) * 100)));
+  return Math.min(
+    100,
+    Math.max(0, Math.round((numerator / denominator) * 100)),
+  );
+}
+
+function formatCurrencyINR(value: number): string {
+  return `Rs ${Math.round(Math.max(0, value)).toLocaleString("en-IN")}`;
 }
 
 function currentMonthKey(date = new Date()): string {
@@ -27,7 +36,9 @@ function startOfWeek(date = new Date()): Date {
 }
 
 function getWeekNumberInYear(date: Date): number {
-  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const d = new Date(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
+  );
   const dayNum = d.getUTCDay() || 7;
   d.setUTCDate(d.getUTCDate() + 4 - dayNum);
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
@@ -85,7 +96,8 @@ export class DashboardGuidanceService {
       return {
         summary: {
           title: "Today's Focus",
-          message: "Sign in with a tenant workspace to see your coaching focus.",
+          message:
+            "Sign in with a tenant workspace to see your coaching focus.",
           tone: "encouraging",
           healthScore: 0,
           journeyStage: "Foundation",
@@ -167,19 +179,13 @@ export class DashboardGuidanceService {
       Boolean(setup?.customerSegmentDefined);
     const setupComplete =
       Boolean(onboarding?.isCompleted) ||
-      (
-        Boolean(onboarding?.businessIdentityCompleted) ||
+      ((Boolean(onboarding?.businessIdentityCompleted) ||
         Boolean(businessIdentity?.companyName && businessIdentity?.usp) ||
-        legacySetupComplete
-      ) &&
-        (
-          Boolean(onboarding?.salesPlanCompleted) ||
-          Boolean(salesPlan?.projectedYearValue)
-        ) &&
-        (
-          Boolean(onboarding?.activityConfigCompleted) ||
-          Boolean(activityConfiguration?.weeklyActivityGoal)
-        );
+        legacySetupComplete) &&
+        (Boolean(onboarding?.salesPlanCompleted) ||
+          Boolean(salesPlan?.projectedYearValue)) &&
+        (Boolean(onboarding?.activityConfigCompleted) ||
+          Boolean(activityConfiguration?.weeklyActivityGoal)));
 
     if (!setupComplete) {
       cards.push({
@@ -215,6 +221,14 @@ export class DashboardGuidanceService {
     const hasCurrentWeeklySalesEntry = weeklySalesEntries.some(
       (entry) => entry.week === currentWeek,
     );
+    const currentWeekAchieved =
+      weeklySalesEntries.find((entry) => entry.week === currentWeek)
+        ?.achieved ?? 0;
+    const weeklyTarget =
+      monthlyTarget > 0
+        ? monthlyTarget / (WEEKS_PER_MONTH[monthNumber - 1] || 4)
+        : 0;
+    const weeklyRemaining = Math.max(0, weeklyTarget - currentWeekAchieved);
 
     if (monthlyTarget > 0) {
       signals.push({
@@ -254,8 +268,14 @@ export class DashboardGuidanceService {
         id: "sales-gap-followups",
         type: "next_action",
         priority: "high",
-        title: "Close the sales gap",
-        message: `You are ${monthlyProgress}% toward this month's target. A focused follow-up today can protect the month.`,
+        title:
+          weeklyRemaining > 0
+            ? `${formatCurrencyINR(weeklyRemaining)} left this week`
+            : "Weekly target cleared",
+        message:
+          weeklyRemaining > 0
+            ? `You logged ${formatCurrencyINR(currentWeekAchieved)} this week. ${formatCurrencyINR(weeklyRemaining)} is still pending to hit the weekly target.`
+            : `You logged ${formatCurrencyINR(currentWeekAchieved)} this week and cleared the weekly target. Now protect the month with one follow-up.`,
         why: "Follow-ups are the fastest action connected to this week's sales gap.",
         actionLabel: "Log sales",
         actionRoute: "/sales",
