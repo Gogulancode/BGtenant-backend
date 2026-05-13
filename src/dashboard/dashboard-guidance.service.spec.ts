@@ -1,0 +1,209 @@
+import { SalesProspectStatus } from "@prisma/client";
+import { DashboardGuidanceService } from "./dashboard-guidance.service";
+import { PrismaService } from "../prisma/prisma.service";
+
+const userId = "user-guidance";
+const tenantId = "tenant-guidance";
+
+function createPrismaMock(overrides: Record<string, unknown> = {}) {
+  const prisma = {
+    onboardingProgress: {
+      findUnique: jest.fn().mockResolvedValue({
+        tenantId,
+        isCompleted: false,
+        profileCompleted: true,
+        businessIdentityCompleted: false,
+        salesPlanCompleted: true,
+        activityConfigCompleted: false,
+        salesCycleCompleted: true,
+        achievementStagesCompleted: true,
+        subscriptionCompleted: true,
+        visualSetupCompleted: false,
+      }),
+    },
+    businessSetupChecklist: {
+      findUnique: jest.fn().mockResolvedValue({
+        uspDefined: true,
+        menuCardDefined: true,
+        packagesDefined: false,
+        customerSegmentDefined: true,
+      }),
+    },
+    salesPlan: {
+      findUnique: jest.fn().mockResolvedValue({
+        projectedYearValue: 1200000,
+        monthlyTargets: [
+          100000, 100000, 100000, 100000, 100000, 100000, 100000, 100000,
+          100000, 100000, 100000, 100000,
+        ],
+        averageTicketSize: 25000,
+        conversionRatio: 25,
+        existingCustomerContribution: 40,
+        newCustomerContribution: 60,
+      }),
+    },
+    salesTracker: {
+      findUnique: jest.fn().mockResolvedValue({
+        target: 100000,
+        achieved: 42000,
+      }),
+    },
+    salesProspect: {
+      count: jest.fn().mockResolvedValue(0),
+      findMany: jest.fn().mockResolvedValue([]),
+    },
+    activity: {
+      count: jest.fn().mockResolvedValue(1),
+    },
+    activityConfiguration: {
+      findUnique: jest.fn().mockResolvedValue({
+        weeklyActivityGoal: 5,
+        enableReminders: true,
+      }),
+    },
+    ...overrides,
+  } as unknown as PrismaService;
+
+  return prisma;
+}
+
+describe("DashboardGuidanceService", () => {
+  it("returns setup guidance when onboarding or business setup is incomplete", async () => {
+    const service = new DashboardGuidanceService(createPrismaMock());
+
+    const result = await service.getGuidance(userId, tenantId);
+
+    expect(result.summary.title).toBe("Today's Focus");
+    expect(result.cards).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "complete-business-setup",
+          source: "setup",
+          priority: "high",
+          actionRoute: "/setup",
+        }),
+      ]),
+    );
+  });
+
+  it("returns starter CRM guidance when there are no prospects", async () => {
+    const service = new DashboardGuidanceService(createPrismaMock());
+
+    const result = await service.getGuidance(userId, tenantId);
+
+    expect(result.cards).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "add-first-prospects",
+          source: "crm",
+          actionLabel: "Add prospects",
+          actionRoute: "/sales/prospects",
+        }),
+      ]),
+    );
+  });
+
+  it("returns sales gap guidance when monthly achievement is behind target", async () => {
+    const service = new DashboardGuidanceService(createPrismaMock());
+
+    const result = await service.getGuidance(userId, tenantId);
+
+    expect(result.cards).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "sales-gap-followups",
+          source: "sales",
+          priority: "high",
+          actionRoute: "/sales",
+        }),
+      ]),
+    );
+    expect(result.signals).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: "monthly_target_progress",
+          value: 42,
+          status: "watch",
+        }),
+      ]),
+    );
+  });
+
+  it("returns CRM follow-up guidance for warm or hot prospects", async () => {
+    const prisma = createPrismaMock({
+      salesProspect: {
+        count: jest.fn().mockResolvedValue(3),
+        findMany: jest.fn().mockResolvedValue([
+          {
+            id: "prospect-1",
+            prospectName: "Acme Traders",
+            status: SalesProspectStatus.HOT,
+            proposalValue: 75000,
+            lastFollowUpAt: new Date("2026-05-07T00:00:00.000Z"),
+          },
+        ]),
+      },
+    });
+    const service = new DashboardGuidanceService(prisma);
+
+    const result = await service.getGuidance(userId, tenantId);
+
+    expect(result.cards).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "crm-followup-acme-traders",
+          source: "crm",
+          actionLabel: "Follow up",
+        }),
+      ]),
+    );
+  });
+
+  it("returns activity rhythm guidance when weekly activity is below configured goal", async () => {
+    const service = new DashboardGuidanceService(createPrismaMock());
+
+    const result = await service.getGuidance(userId, tenantId);
+
+    expect(result.cards).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "activity-rhythm",
+          source: "activity",
+          actionRoute: "/activities",
+        }),
+      ]),
+    );
+  });
+
+  it("uses tenant and user filters for tenant scoped data", async () => {
+    const prisma = createPrismaMock() as unknown as {
+      onboardingProgress: { findUnique: jest.Mock };
+      businessSetupChecklist: { findUnique: jest.Mock };
+      salesPlan: { findUnique: jest.Mock };
+      salesTracker: { findUnique: jest.Mock };
+      salesProspect: { count: jest.Mock; findMany: jest.Mock };
+      activity: { count: jest.Mock };
+      activityConfiguration: { findUnique: jest.Mock };
+    };
+    const service = new DashboardGuidanceService(
+      prisma as unknown as PrismaService,
+    );
+
+    await service.getGuidance(userId, tenantId);
+
+    expect(prisma.onboardingProgress.findUnique).toHaveBeenCalledWith({
+      where: { tenantId },
+    });
+    expect(prisma.salesTracker.findUnique).toHaveBeenCalledWith({
+      where: {
+        tenantId_userId_month: expect.objectContaining({ tenantId, userId }),
+      },
+    });
+    expect(prisma.salesProspect.count).toHaveBeenCalledWith({
+      where: { tenantId, userId },
+    });
+    expect(prisma.activity.count).toHaveBeenCalledWith({
+      where: expect.objectContaining({ tenantId, userId }),
+    });
+  });
+});
