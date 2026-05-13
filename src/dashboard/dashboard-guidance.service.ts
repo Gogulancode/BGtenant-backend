@@ -263,29 +263,6 @@ export class DashboardGuidanceService {
       });
     }
 
-    if (monthlyTarget > 0 && monthlyProgress < 70) {
-      cards.push({
-        id: "sales-gap-followups",
-        type: "next_action",
-        priority: "high",
-        title:
-          weeklyRemaining > 0
-            ? `${formatCurrencyINR(weeklyRemaining)} left this week`
-            : "Weekly target cleared",
-        message:
-          weeklyRemaining > 0
-            ? `You logged ${formatCurrencyINR(currentWeekAchieved)} this week. ${formatCurrencyINR(weeklyRemaining)} is still pending to hit the weekly target.`
-            : `You logged ${formatCurrencyINR(currentWeekAchieved)} this week and cleared the weekly target. Now protect the month with one follow-up.`,
-        why: "Follow-ups are the fastest action connected to this week's sales gap.",
-        actionLabel: "Log sales",
-        actionRoute: "/sales",
-        source: "sales",
-        impactMetric: "sales_gap",
-        afterActionMessage:
-          "Good. Your sales progress moved. Next, schedule one follow-up to protect the month.",
-      });
-    }
-
     signals.push({
       key: "crm_prospect_count",
       label: "CRM prospects",
@@ -362,6 +339,48 @@ export class DashboardGuidanceService {
         impactMetric: "activity_rhythm",
         afterActionMessage:
           "Good. Your rhythm improved. Next, connect this action to a prospect or weekly outcome.",
+      });
+    }
+
+    if (
+      hasCurrentWeeklySalesEntry &&
+      monthlyTarget > 0 &&
+      monthlyProgress < 70
+    ) {
+      const hasProspectAction = prospectCount > 0 || followUps.length > 0;
+      const needsActivityAction = weeklyGoal > 0 && activityProgress < 100;
+
+      cards.push({
+        id: "execution-gap-action",
+        type: "next_action",
+        priority: weeklyRemaining > 0 ? "high" : "medium",
+        title:
+          weeklyRemaining > 0
+            ? "Turn the gap into follow-ups"
+            : "Protect this week's momentum",
+        message:
+          weeklyRemaining > 0
+            ? `Sales shows ${formatCurrencyINR(weeklyRemaining)} still pending this week. The next useful move is not more tracking; it is one follow-up or one activity that can create the next order.`
+            : `Sales is logged and the weekly target is cleared. Keep momentum by creating the next follow-up or activity, so next week's sales has a source.`,
+        why: "Sales is the result. Follow-ups, activities, and pipeline actions are the controllable inputs.",
+        actionLabel: hasProspectAction
+          ? "Follow up"
+          : needsActivityAction
+            ? "Add activity"
+            : "Add prospects",
+        actionRoute: hasProspectAction
+          ? "/sales/prospects"
+          : needsActivityAction
+            ? "/activities"
+            : "/sales/prospects",
+        source: hasProspectAction
+          ? "crm"
+          : needsActivityAction
+            ? "activity"
+            : "crm",
+        impactMetric: hasProspectAction ? "crm_pipeline" : "activity_rhythm",
+        afterActionMessage:
+          "Good. You moved the input that creates future sales. Keep the loop clean by logging the outcome.",
       });
     }
 

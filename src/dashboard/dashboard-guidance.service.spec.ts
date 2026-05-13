@@ -77,6 +77,10 @@ function createPrismaMock(overrides: Record<string, unknown> = {}) {
 }
 
 describe("DashboardGuidanceService", () => {
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it("returns setup guidance when onboarding or business setup is incomplete", async () => {
     const service = new DashboardGuidanceService(
       createPrismaMock({
@@ -158,22 +162,30 @@ describe("DashboardGuidanceService", () => {
     );
   });
 
-  it("returns sales gap guidance when monthly achievement is behind target", async () => {
-    const service = new DashboardGuidanceService(createPrismaMock());
+  it("returns action-led execution guidance when sales is behind target", async () => {
+    jest.useFakeTimers().setSystemTime(new Date("2026-05-13T12:00:00.000Z"));
+    const service = new DashboardGuidanceService(
+      createPrismaMock({
+        weeklySalesEntry: {
+          findMany: jest
+            .fn()
+            .mockResolvedValue([{ week: 20, achieved: 10000 }]),
+        },
+      }),
+    );
 
     const result = await service.getGuidance(userId, tenantId);
 
     expect(result.cards).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          id: "sales-gap-followups",
-          source: "sales",
+          id: "execution-gap-action",
+          source: expect.stringMatching(/crm|activity/),
           priority: "high",
-          title: expect.stringContaining("left this week"),
-          message: expect.stringContaining("still pending"),
-          impactMetric: "sales_gap",
-          why: expect.any(String),
-          actionRoute: "/sales",
+          title: "Turn the gap into follow-ups",
+          message: expect.stringContaining("not more tracking"),
+          impactMetric: expect.stringMatching(/crm_pipeline|activity_rhythm/),
+          why: expect.stringContaining("Sales is the result"),
         }),
       ]),
     );
@@ -181,11 +193,12 @@ describe("DashboardGuidanceService", () => {
       expect.arrayContaining([
         expect.objectContaining({
           key: "monthly_target_progress",
-          value: 42,
-          status: "watch",
+          value: 10,
+          status: "risk",
         }),
       ]),
     );
+    jest.useRealTimers();
   });
 
   it("returns CRM follow-up guidance for warm or hot prospects", async () => {
