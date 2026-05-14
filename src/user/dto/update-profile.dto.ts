@@ -1,6 +1,18 @@
-import { IsOptional, IsString, IsEnum, IsObject, IsUrl, ValidateNested, IsBoolean } from "class-validator";
+import {
+  IsBoolean,
+  IsEnum,
+  IsInt,
+  IsObject,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Max,
+  MaxLength,
+  Min,
+  ValidateNested,
+} from "class-validator";
 import { Type } from "class-transformer";
-import { BusinessType } from "@prisma/client";
+import { BusinessType, Gender, MaritalStatus } from "@prisma/client";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class SocialHandlesDto {
@@ -26,7 +38,10 @@ export class SocialHandlesDto {
 }
 
 export class PainPointsDto {
-  @ApiProperty({ required: false, description: "Difficulty getting new customers" })
+  @ApiProperty({
+    required: false,
+    description: "Difficulty getting new customers",
+  })
   @IsOptional()
   @IsBoolean()
   gettingCustomers?: boolean;
@@ -36,7 +51,10 @@ export class PainPointsDto {
   @IsBoolean()
   pricing?: boolean;
 
-  @ApiProperty({ required: false, description: "Difficulty negotiating with clients" })
+  @ApiProperty({
+    required: false,
+    description: "Difficulty negotiating with clients",
+  })
   @IsOptional()
   @IsBoolean()
   negotiating?: boolean;
@@ -46,7 +64,10 @@ export class PainPointsDto {
   @IsBoolean()
   referrals?: boolean;
 
-  @ApiProperty({ required: false, description: "Difficulty retaining existing customers" })
+  @ApiProperty({
+    required: false,
+    description: "Difficulty retaining existing customers",
+  })
   @IsOptional()
   @IsBoolean()
   retaining?: boolean;
@@ -63,10 +84,34 @@ export class UpdateProfileDto {
   @IsString()
   name?: string;
 
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(18)
+  @Max(120)
+  age?: number;
+
+  @ApiProperty({ enum: Gender, required: false })
+  @IsOptional()
+  @IsEnum(Gender)
+  gender?: Gender;
+
+  @ApiProperty({ enum: MaritalStatus, required: false })
+  @IsOptional()
+  @IsEnum(MaritalStatus)
+  maritalStatus?: MaritalStatus;
+
   @ApiProperty({ enum: BusinessType, required: false })
   @IsOptional()
   @IsEnum(BusinessType)
   businessType?: BusinessType;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  businessDescription?: string;
 
   @ApiProperty({ required: false, type: SocialHandlesDto })
   @IsOptional()

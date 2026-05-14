@@ -29,7 +29,11 @@ const userSelectFields = {
   id: true,
   name: true,
   email: true,
+  age: true,
+  gender: true,
+  maritalStatus: true,
   businessType: true,
+  businessDescription: true,
   role: true,
   isActive: true,
   timezone: true,
@@ -69,9 +73,19 @@ export class UserService {
     // Convert DTO to Prisma-compatible data (JSON fields need casting)
     const data: any = {};
     if (updateProfileDto.name !== undefined) data.name = updateProfileDto.name;
-    if (updateProfileDto.businessType !== undefined) data.businessType = updateProfileDto.businessType;
-    if (updateProfileDto.socialHandles !== undefined) data.socialHandles = updateProfileDto.socialHandles;
-    if (updateProfileDto.painPoints !== undefined) data.painPoints = updateProfileDto.painPoints;
+    if (updateProfileDto.age !== undefined) data.age = updateProfileDto.age;
+    if (updateProfileDto.gender !== undefined)
+      data.gender = updateProfileDto.gender;
+    if (updateProfileDto.maritalStatus !== undefined)
+      data.maritalStatus = updateProfileDto.maritalStatus;
+    if (updateProfileDto.businessDescription !== undefined)
+      data.businessDescription = updateProfileDto.businessDescription;
+    if (updateProfileDto.businessType !== undefined)
+      data.businessType = updateProfileDto.businessType;
+    if (updateProfileDto.socialHandles !== undefined)
+      data.socialHandles = updateProfileDto.socialHandles;
+    if (updateProfileDto.painPoints !== undefined)
+      data.painPoints = updateProfileDto.painPoints;
 
     return this.prisma.user.update({
       where: { id: userId },

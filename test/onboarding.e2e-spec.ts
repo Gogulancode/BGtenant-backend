@@ -108,7 +108,10 @@ describe("OnboardingController (e2e)", () => {
     yearMinus3Value: 500000,
     projectedYearValue: 1500000,
     monthlyContribution: [8, 7, 8, 9, 8, 7, 9, 10, 9, 8, 8, 9],
-    monthlyTargets: [120000, 105000, 120000, 135000, 120000, 105000, 135000, 150000, 135000, 120000, 120000, 135000],
+    monthlyTargets: [
+      120000, 105000, 120000, 135000, 120000, 105000, 135000, 150000, 135000,
+      120000, 120000, 135000,
+    ],
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -130,17 +133,64 @@ describe("OnboardingController (e2e)", () => {
 
   const mockSalesCycleStages = {
     stages: [
-      { id: "s1", tenantId: "tenant-abc", name: "Lead", order: 1, probability: 10, isActive: true, createdAt: new Date(), updatedAt: new Date() },
-      { id: "s2", tenantId: "tenant-abc", name: "Qualified", order: 2, probability: 25, isActive: true, createdAt: new Date(), updatedAt: new Date() },
-      { id: "s3", tenantId: "tenant-abc", name: "Closed", order: 3, probability: 100, isActive: true, createdAt: new Date(), updatedAt: new Date() },
+      {
+        id: "s1",
+        tenantId: "tenant-abc",
+        name: "Lead",
+        order: 1,
+        probability: 10,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: "s2",
+        tenantId: "tenant-abc",
+        name: "Qualified",
+        order: 2,
+        probability: 25,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: "s3",
+        tenantId: "tenant-abc",
+        name: "Closed",
+        order: 3,
+        probability: 100,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ],
     totalStages: 3,
   };
 
   const mockAchievementStages = {
     stages: [
-      { id: "a1", tenantId: "tenant-abc", name: "Bronze", order: 1, targetValue: 375000, percentOfGoal: 25, isActive: true, createdAt: new Date(), updatedAt: new Date() },
-      { id: "a2", tenantId: "tenant-abc", name: "Platinum", order: 2, targetValue: 1500000, percentOfGoal: 100, isActive: true, createdAt: new Date(), updatedAt: new Date() },
+      {
+        id: "a1",
+        tenantId: "tenant-abc",
+        name: "Bronze",
+        order: 1,
+        targetValue: 375000,
+        percentOfGoal: 25,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: "a2",
+        tenantId: "tenant-abc",
+        name: "Platinum",
+        order: 2,
+        targetValue: 1500000,
+        percentOfGoal: 100,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ],
     totalStages: 2,
   };
@@ -166,9 +216,13 @@ describe("OnboardingController (e2e)", () => {
       getSalesPlan: jest.fn().mockResolvedValue(mockSalesPlan),
       upsertSalesPlan: jest.fn().mockResolvedValue(mockSalesPlan),
       getActivityConfiguration: jest.fn().mockResolvedValue(mockActivityConfig),
-      upsertActivityConfiguration: jest.fn().mockResolvedValue(mockActivityConfig),
+      upsertActivityConfiguration: jest
+        .fn()
+        .mockResolvedValue(mockActivityConfig),
       getSalesCycleStages: jest.fn().mockResolvedValue(mockSalesCycleStages),
-      replaceSalesCycleStages: jest.fn().mockResolvedValue(mockSalesCycleStages),
+      replaceSalesCycleStages: jest
+        .fn()
+        .mockResolvedValue(mockSalesCycleStages),
       initializeDefaultSalesCycle: jest.fn().mockResolvedValue({
         stages: DEFAULT_SALES_CYCLE_STAGES.map((s, i) => ({
           id: `s${i}`,
@@ -181,9 +235,15 @@ describe("OnboardingController (e2e)", () => {
         totalStages: 5,
       }),
       getAchievementStages: jest.fn().mockResolvedValue(mockAchievementStages),
-      replaceAchievementStages: jest.fn().mockResolvedValue(mockAchievementStages),
-      getSelectedSubscription: jest.fn().mockResolvedValue(mockSubscriptionSelection),
-      selectSubscription: jest.fn().mockResolvedValue(mockSubscriptionSelection),
+      replaceAchievementStages: jest
+        .fn()
+        .mockResolvedValue(mockAchievementStages),
+      getSelectedSubscription: jest
+        .fn()
+        .mockResolvedValue(mockSubscriptionSelection),
+      selectSubscription: jest
+        .fn()
+        .mockResolvedValue(mockSubscriptionSelection),
       completeOnboarding: jest.fn().mockResolvedValue({
         ...mockProgress,
         isCompleted: true,
@@ -228,6 +288,7 @@ describe("OnboardingController (e2e)", () => {
 
       expect(onboardingService.getOnboardingProgress).toHaveBeenCalledWith(
         activeUser.tenantId,
+        activeUser.userId,
       );
       expect(response.body).toMatchObject({
         id: "progress-1",
@@ -286,6 +347,7 @@ describe("OnboardingController (e2e)", () => {
       expect(onboardingService.updateOnboardingProgress).toHaveBeenCalledWith(
         activeUser.tenantId,
         dto,
+        activeUser.userId,
       );
     });
 
@@ -483,6 +545,10 @@ describe("OnboardingController (e2e)", () => {
     it("creates/updates sales plan with valid monthly contribution", async () => {
       const dto = {
         projectedYearValue: 1500000,
+        averageTicketSize: 25000,
+        conversionRatio: 20,
+        existingCustomerContribution: 40,
+        newCustomerContribution: 60,
         monthlyContribution: [8, 7, 8, 9, 8, 7, 9, 10, 9, 8, 8, 9],
       };
 
@@ -569,10 +635,9 @@ describe("OnboardingController (e2e)", () => {
         .send(dto)
         .expect(200);
 
-      expect(onboardingService.upsertActivityConfiguration).toHaveBeenCalledWith(
-        activeUser.tenantId,
-        dto,
-      );
+      expect(
+        onboardingService.upsertActivityConfiguration,
+      ).toHaveBeenCalledWith(activeUser.tenantId, dto);
     });
 
     it("validates weeklyActivityGoal range (1-50)", async () => {
@@ -692,9 +757,9 @@ describe("OnboardingController (e2e)", () => {
         .post("/onboarding/sales-cycle/defaults")
         .expect(201);
 
-      expect(onboardingService.initializeDefaultSalesCycle).toHaveBeenCalledWith(
-        activeUser.tenantId,
-      );
+      expect(
+        onboardingService.initializeDefaultSalesCycle,
+      ).toHaveBeenCalledWith(activeUser.tenantId);
       expect(response.body.totalStages).toBe(5);
     });
   });
@@ -720,7 +785,12 @@ describe("OnboardingController (e2e)", () => {
       const dto = {
         stages: [
           { name: "Bronze", order: 1, targetValue: 375000, percentOfGoal: 25 },
-          { name: "Platinum", order: 2, targetValue: 1500000, percentOfGoal: 100 },
+          {
+            name: "Platinum",
+            order: 2,
+            targetValue: 1500000,
+            percentOfGoal: 100,
+          },
         ],
       };
 
@@ -866,22 +936,34 @@ describe("OnboardingController (e2e)", () => {
       ];
 
       for (const endpoint of endpoints) {
-        await request(app.getHttpServer())[endpoint.method](endpoint.path).expect(200);
+        await request(app.getHttpServer())
+          [endpoint.method](endpoint.path)
+          .expect(200);
       }
 
       // All service calls should have received the tenant ID from the JWT
-      expect(onboardingService.getOnboardingProgress).toHaveBeenCalledWith("tenant-abc");
-      expect(onboardingService.getBusinessIdentity).toHaveBeenCalledWith("tenant-abc");
+      expect(onboardingService.getOnboardingProgress).toHaveBeenCalledWith(
+        "tenant-abc",
+        activeUser.userId,
+      );
+      expect(onboardingService.getBusinessIdentity).toHaveBeenCalledWith(
+        "tenant-abc",
+      );
       expect(onboardingService.getSalesPlan).toHaveBeenCalledWith("tenant-abc");
     });
 
     it("prevents cross-tenant access by using JWT tenant context", async () => {
-      activeUser = { userId: "user-1", tenantId: "tenant-secure", role: Role.STAFF };
+      activeUser = {
+        userId: "user-1",
+        tenantId: "tenant-secure",
+        role: Role.STAFF,
+      };
 
       await request(app.getHttpServer()).get("/onboarding").expect(200);
 
       expect(onboardingService.getOnboardingProgress).toHaveBeenCalledWith(
         "tenant-secure",
+        "user-1",
       );
     });
   });

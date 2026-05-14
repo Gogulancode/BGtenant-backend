@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { SubscriptionPlan } from "@prisma/client";
+import { Gender, MaritalStatus, SubscriptionPlan } from "@prisma/client";
 
 export const ONBOARDING_STEP_TITLES: Record<string, string> = {
   "1": "Profile Setup",
@@ -15,29 +15,71 @@ export const ONBOARDING_STEP_TITLES: Record<string, string> = {
 export const MAX_ONBOARDING_STEPS = 8;
 
 export class OnboardingStepFlags {
-  @ApiProperty({ description: 'Profile step completed', example: true })
+  @ApiProperty({ description: "Profile step completed", example: true })
   profileCompleted: boolean;
 
-  @ApiProperty({ description: 'Business identity step completed', example: false })
+  @ApiProperty({
+    description: "Business identity step completed",
+    example: false,
+  })
   businessIdentityCompleted: boolean;
 
-  @ApiProperty({ description: 'Sales plan step completed', example: false })
+  @ApiProperty({ description: "Sales plan step completed", example: false })
   salesPlanCompleted: boolean;
 
-  @ApiProperty({ description: 'Activity configuration step completed', example: false })
+  @ApiProperty({
+    description: "Activity configuration step completed",
+    example: false,
+  })
   activityConfigCompleted: boolean;
 
-  @ApiProperty({ description: 'Sales cycle step completed', example: false })
+  @ApiProperty({ description: "Sales cycle step completed", example: false })
   salesCycleCompleted: boolean;
 
-  @ApiProperty({ description: 'Achievement stages step completed', example: false })
+  @ApiProperty({
+    description: "Achievement stages step completed",
+    example: false,
+  })
   achievementStagesCompleted: boolean;
 
-  @ApiProperty({ description: 'Subscription step completed', example: false })
+  @ApiProperty({ description: "Subscription step completed", example: false })
   subscriptionCompleted: boolean;
 
-  @ApiProperty({ description: 'Visual/finish step completed', example: false })
+  @ApiProperty({ description: "Visual/finish step completed", example: false })
   visualSetupCompleted: boolean;
+}
+
+export class OnboardingProgressUserDto {
+  @ApiProperty({ description: "User ID" })
+  id: string;
+
+  @ApiProperty({ description: "User name" })
+  name: string;
+
+  @ApiProperty({ description: "User email" })
+  email: string;
+
+  @ApiPropertyOptional({ description: "Owner age" })
+  age?: number;
+
+  @ApiPropertyOptional({ enum: Gender })
+  gender?: Gender;
+
+  @ApiPropertyOptional({ enum: MaritalStatus })
+  maritalStatus?: MaritalStatus;
+
+  @ApiPropertyOptional({
+    description: "Business description captured in setup",
+  })
+  businessDescription?: string;
+
+  @ApiPropertyOptional({ description: "Social links captured in setup" })
+  socialHandles?: Record<string, unknown>;
+
+  @ApiPropertyOptional({
+    description: "Business pain points captured in setup",
+  })
+  painPoints?: Record<string, unknown>;
 }
 
 export class OnboardingProgressResponseDto {
@@ -81,6 +123,12 @@ export class OnboardingProgressResponseDto {
     enum: SubscriptionPlan,
   })
   selectedPlan?: SubscriptionPlan;
+
+  @ApiPropertyOptional({
+    description: "Profile data used to pre-fill onboarding Step 1",
+    type: OnboardingProgressUserDto,
+  })
+  user?: OnboardingProgressUserDto;
 
   @ApiProperty({
     description: "Step number to title mapping for UI display",

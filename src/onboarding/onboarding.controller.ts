@@ -70,7 +70,10 @@ export class OnboardingController {
   @Get()
   @Roles(...TENANT_MEMBER_ROLES)
   async getProgress(@CurrentUser() user: UserContext) {
-    return this.onboardingService.getOnboardingProgress(user.tenantId);
+    return this.onboardingService.getOnboardingProgress(
+      user.tenantId,
+      user.userId,
+    );
   }
 
   @ApiOperation({
@@ -82,7 +85,9 @@ export class OnboardingController {
     description: "Onboarding progress updated successfully",
     type: OnboardingProgressResponseDto,
   })
-  @ApiBadRequestResponse({ description: "Invalid input data or step skipping attempt" })
+  @ApiBadRequestResponse({
+    description: "Invalid input data or step skipping attempt",
+  })
   @ApiNotFoundResponse({ description: "Tenant not found" })
   @Patch()
   @HttpCode(HttpStatus.OK)
@@ -91,7 +96,11 @@ export class OnboardingController {
     @CurrentUser() user: UserContext,
     @Body() dto: UpdateOnboardingDto,
   ) {
-    return this.onboardingService.updateOnboardingProgress(user.tenantId, dto);
+    return this.onboardingService.updateOnboardingProgress(
+      user.tenantId,
+      dto,
+      user.userId,
+    );
   }
 
   // ============================================
@@ -128,7 +137,8 @@ export class OnboardingController {
 
   @ApiOperation({
     summary: "Get business identity",
-    description: "Retrieves the business identity configuration for the tenant.",
+    description:
+      "Retrieves the business identity configuration for the tenant.",
   })
   @ApiOkResponse({
     description: "Business identity retrieved successfully",
@@ -165,7 +175,8 @@ export class OnboardingController {
 
   @ApiOperation({
     summary: "Get sales plan",
-    description: "Retrieves the sales plan with historical data and projections.",
+    description:
+      "Retrieves the sales plan with historical data and projections.",
   })
   @ApiOkResponse({
     description: "Sales plan retrieved successfully",
@@ -187,7 +198,8 @@ export class OnboardingController {
     type: SalesPlanResponseDto,
   })
   @ApiBadRequestResponse({
-    description: "Invalid input data or monthly contribution percentages do not sum to 100%",
+    description:
+      "Invalid input data or monthly contribution percentages do not sum to 100%",
   })
   @Put("sales-plan")
   @Roles(...TENANT_MEMBER_ROLES)
@@ -204,7 +216,8 @@ export class OnboardingController {
 
   @ApiOperation({
     summary: "Get activity configuration",
-    description: "Retrieves the activity tracking configuration for the tenant.",
+    description:
+      "Retrieves the activity tracking configuration for the tenant.",
   })
   @ApiOkResponse({
     description: "Activity configuration retrieved successfully",
@@ -232,7 +245,10 @@ export class OnboardingController {
     @CurrentUser() user: UserContext,
     @Body() dto: ActivityConfigurationDto,
   ) {
-    return this.onboardingService.upsertActivityConfiguration(user.tenantId, dto);
+    return this.onboardingService.upsertActivityConfiguration(
+      user.tenantId,
+      dto,
+    );
   }
 
   // ============================================
@@ -262,7 +278,9 @@ export class OnboardingController {
     description: "Sales cycle stages saved successfully",
     type: SalesCycleSetupResponseDto,
   })
-  @ApiBadRequestResponse({ description: "Invalid input data or duplicate order numbers" })
+  @ApiBadRequestResponse({
+    description: "Invalid input data or duplicate order numbers",
+  })
   @Put("sales-cycle")
   @Roles(...TENANT_MEMBER_ROLES)
   async replaceSalesCycleStages(
@@ -315,7 +333,9 @@ export class OnboardingController {
     description: "Achievement stages saved successfully",
     type: AchievementStagesSetupResponseDto,
   })
-  @ApiBadRequestResponse({ description: "Invalid input data or duplicate order numbers" })
+  @ApiBadRequestResponse({
+    description: "Invalid input data or duplicate order numbers",
+  })
   @Put("achievement-stages")
   @Roles(...TENANT_MEMBER_ROLES)
   async replaceAchievementStages(
@@ -375,7 +395,9 @@ export class OnboardingController {
     description: "Onboarding completed successfully",
     type: OnboardingProgressResponseDto,
   })
-  @ApiBadRequestResponse({ description: "Not all required steps are completed" })
+  @ApiBadRequestResponse({
+    description: "Not all required steps are completed",
+  })
   @ApiNotFoundResponse({ description: "Onboarding progress not found" })
   @Post("complete")
   @HttpCode(HttpStatus.OK)

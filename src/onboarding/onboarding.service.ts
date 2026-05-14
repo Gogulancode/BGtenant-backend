@@ -75,6 +75,7 @@ export class OnboardingService {
    */
   async getOnboardingProgress(
     tenantId: string,
+    userId?: string,
   ): Promise<OnboardingProgressResponseDto> {
     try {
       const progress = await this.prisma.onboardingProgress.upsert({
@@ -88,7 +89,10 @@ export class OnboardingService {
         },
       });
 
-      return this.mapToProgressResponse(progress);
+      return this.mapToProgressResponse(
+        progress,
+        userId ? await this.getOnboardingUser(userId, tenantId) : undefined,
+      );
     } catch (error) {
       if (
         error instanceof Error &&
@@ -107,6 +111,7 @@ export class OnboardingService {
   async updateOnboardingProgress(
     tenantId: string,
     dto: UpdateOnboardingDto,
+    userId?: string,
   ): Promise<OnboardingProgressResponseDto> {
     const existing = await this.getOnboardingProgress(tenantId);
 
@@ -125,9 +130,14 @@ export class OnboardingService {
 
     // Append completed step if not already in the list
     if (dto.completedStep) {
-      const alreadyCompleted = existing.stepsCompleted.includes(dto.completedStep);
+      const alreadyCompleted = existing.stepsCompleted.includes(
+        dto.completedStep,
+      );
       if (!alreadyCompleted) {
-        updateData.stepsCompleted = [...existing.stepsCompleted, dto.completedStep];
+        updateData.stepsCompleted = [
+          ...existing.stepsCompleted,
+          dto.completedStep,
+        ];
       }
     }
 
@@ -145,7 +155,14 @@ export class OnboardingService {
     }
 
     if (Object.keys(updateData).length === 0) {
-      return existing;
+      return userId
+        ? {
+            ...existing,
+            user: this.mapOnboardingUser(
+              await this.getOnboardingUser(userId, tenantId),
+            ),
+          }
+        : existing;
     }
 
     const updated = await this.prisma.onboardingProgress.update({
@@ -157,11 +174,25 @@ export class OnboardingService {
       `Updated onboarding progress for tenant ${tenantId}: step=${updated.currentStep}`,
     );
 
-    return this.mapToProgressResponse(updated);
+    return this.mapToProgressResponse(
+      updated,
+      userId ? await this.getOnboardingUser(userId, tenantId) : undefined,
+    );
   }
 
   private mapToProgressResponse(
     progress: OnboardingProgress,
+    user?: {
+      id: string;
+      name: string;
+      email: string;
+      age: number | null;
+      gender: string | null;
+      maritalStatus: string | null;
+      businessDescription: string | null;
+      socialHandles: unknown;
+      painPoints: unknown;
+    } | null,
   ): OnboardingProgressResponseDto {
     return {
       id: progress.id,
@@ -181,11 +212,61 @@ export class OnboardingService {
         visualSetupCompleted: progress.visualSetupCompleted,
       },
       selectedPlan: progress.selectedPlan || undefined,
+      user: this.mapOnboardingUser(user),
       stepTitles: ONBOARDING_STEP_TITLES,
       totalSteps: MAX_ONBOARDING_STEPS,
       createdAt: progress.createdAt,
       updatedAt: progress.updatedAt,
     };
+  }
+
+  private mapOnboardingUser(
+    user?: {
+      id: string;
+      name: string;
+      email: string;
+      age: number | null;
+      gender: string | null;
+      maritalStatus: string | null;
+      businessDescription: string | null;
+      socialHandles: unknown;
+      painPoints: unknown;
+    } | null,
+  ): OnboardingProgressResponseDto["user"] {
+    return user
+      ? {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          age: user.age || undefined,
+          gender: user.gender as NonNullable<
+            OnboardingProgressResponseDto["user"]
+          >["gender"],
+          maritalStatus: user.maritalStatus as NonNullable<
+            OnboardingProgressResponseDto["user"]
+          >["maritalStatus"],
+          businessDescription: user.businessDescription || undefined,
+          socialHandles: user.socialHandles as Record<string, unknown>,
+          painPoints: user.painPoints as Record<string, unknown>,
+        }
+      : undefined;
+  }
+
+  private async getOnboardingUser(userId: string, tenantId: string) {
+    return this.prisma.user.findFirst({
+      where: { id: userId, tenantId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        age: true,
+        gender: true,
+        maritalStatus: true,
+        businessDescription: true,
+        socialHandles: true,
+        painPoints: true,
+      },
+    });
   }
 
   // ============================================
@@ -214,8 +295,8 @@ export class OnboardingService {
         maritalStatus: dto.maritalStatus,
         businessType: dto.businessType,
         businessDescription: dto.businessDescription,
-        socialHandles: dto.socialHandles 
-          ? JSON.parse(JSON.stringify(dto.socialHandles)) 
+        socialHandles: dto.socialHandles
+          ? JSON.parse(JSON.stringify(dto.socialHandles))
           : undefined,
         painPoints: dto.painPoints
           ? JSON.parse(JSON.stringify(dto.painPoints))
@@ -224,7 +305,11 @@ export class OnboardingService {
     });
 
     // Mark step as completed
-    await this.markStepCompleted(tenantId, OnboardingStep.PROFILE, 'profileCompleted');
+    await this.markStepCompleted(
+      tenantId,
+      OnboardingStep.PROFILE,
+      "profileCompleted",
+    );
 
     this.logger.log(`Profile onboarding updated for user ${userId}`);
 
@@ -233,12 +318,15 @@ export class OnboardingService {
       name: updated.name,
       email: updated.email,
       age: updated.age || undefined,
-      gender: updated.gender as ProfileOnboardingResponseDto['gender'],
-      maritalStatus: updated.maritalStatus as ProfileOnboardingResponseDto['maritalStatus'],
+      gender: updated.gender as ProfileOnboardingResponseDto["gender"],
+      maritalStatus:
+        updated.maritalStatus as ProfileOnboardingResponseDto["maritalStatus"],
       businessType: updated.businessType,
       businessDescription: updated.businessDescription || undefined,
-      socialHandles: updated.socialHandles as ProfileOnboardingResponseDto['socialHandles'],
-      painPoints: updated.painPoints as ProfileOnboardingResponseDto['painPoints'],
+      socialHandles:
+        updated.socialHandles as ProfileOnboardingResponseDto["socialHandles"],
+      painPoints:
+        updated.painPoints as ProfileOnboardingResponseDto["painPoints"],
       updatedAt: updated.updatedAt,
     };
   }
@@ -292,14 +380,20 @@ export class OnboardingService {
       },
     });
 
-    await this.markStepCompleted(tenantId, OnboardingStep.BUSINESS_IDENTITY, 'businessIdentityCompleted');
+    await this.markStepCompleted(
+      tenantId,
+      OnboardingStep.BUSINESS_IDENTITY,
+      "businessIdentityCompleted",
+    );
 
     this.logger.log(`Business identity updated for tenant ${tenantId}`);
 
     return businessIdentity as BusinessIdentityResponseDto;
   }
 
-  async getBusinessIdentity(tenantId: string): Promise<BusinessIdentityResponseDto | null> {
+  async getBusinessIdentity(
+    tenantId: string,
+  ): Promise<BusinessIdentityResponseDto | null> {
     const identity = await this.prisma.businessIdentity.findUnique({
       where: { tenantId },
     });
@@ -365,7 +459,11 @@ export class OnboardingService {
       },
     });
 
-    await this.markStepCompleted(tenantId, OnboardingStep.SALES_PLAN, 'salesPlanCompleted');
+    await this.markStepCompleted(
+      tenantId,
+      OnboardingStep.SALES_PLAN,
+      "salesPlanCompleted",
+    );
 
     this.logger.log(
       `Sales plan updated for tenant ${tenantId}: projected=${dto.projectedYearValue}`,
@@ -420,7 +518,11 @@ export class OnboardingService {
       },
     });
 
-    await this.markStepCompleted(tenantId, OnboardingStep.ACTIVITY_CONFIG, 'activityConfigCompleted');
+    await this.markStepCompleted(
+      tenantId,
+      OnboardingStep.ACTIVITY_CONFIG,
+      "activityConfigCompleted",
+    );
 
     this.logger.log(`Activity configuration updated for tenant ${tenantId}`);
 
@@ -447,7 +549,9 @@ export class OnboardingService {
     // Validate unique orders
     const orders = dto.stages.map((s) => s.order);
     if (new Set(orders).size !== orders.length) {
-      throw new BadRequestException("Each stage must have a unique order number");
+      throw new BadRequestException(
+        "Each stage must have a unique order number",
+      );
     }
 
     // Delete existing stages and create new ones in a transaction
@@ -471,7 +575,11 @@ export class OnboardingService {
       );
     });
 
-    await this.markStepCompleted(tenantId, OnboardingStep.SALES_CYCLE, 'salesCycleCompleted');
+    await this.markStepCompleted(
+      tenantId,
+      OnboardingStep.SALES_CYCLE,
+      "salesCycleCompleted",
+    );
 
     this.logger.log(
       `Sales cycle stages replaced for tenant ${tenantId}: ${stages.length} stages`,
@@ -494,10 +602,12 @@ export class OnboardingService {
     };
   }
 
-  async getSalesCycleStages(tenantId: string): Promise<SalesCycleSetupResponseDto> {
+  async getSalesCycleStages(
+    tenantId: string,
+  ): Promise<SalesCycleSetupResponseDto> {
     const stages = await this.prisma.salesCycleStage.findMany({
       where: { tenantId, isActive: true },
-      orderBy: { order: 'asc' },
+      orderBy: { order: "asc" },
     });
 
     return {
@@ -517,7 +627,9 @@ export class OnboardingService {
     };
   }
 
-  async initializeDefaultSalesCycle(tenantId: string): Promise<SalesCycleSetupResponseDto> {
+  async initializeDefaultSalesCycle(
+    tenantId: string,
+  ): Promise<SalesCycleSetupResponseDto> {
     return this.replaceSalesCycleStages(tenantId, {
       stages: DEFAULT_SALES_CYCLE_STAGES,
     });
@@ -534,7 +646,9 @@ export class OnboardingService {
     // Validate unique orders
     const orders = dto.stages.map((s) => s.order);
     if (new Set(orders).size !== orders.length) {
-      throw new BadRequestException("Each stage must have a unique order number");
+      throw new BadRequestException(
+        "Each stage must have a unique order number",
+      );
     }
 
     // Delete existing stages and create new ones in a transaction
@@ -560,7 +674,11 @@ export class OnboardingService {
       );
     });
 
-    await this.markStepCompleted(tenantId, OnboardingStep.ACHIEVEMENT_STAGES, 'achievementStagesCompleted');
+    await this.markStepCompleted(
+      tenantId,
+      OnboardingStep.ACHIEVEMENT_STAGES,
+      "achievementStagesCompleted",
+    );
 
     this.logger.log(
       `Achievement stages replaced for tenant ${tenantId}: ${stages.length} stages`,
@@ -585,10 +703,12 @@ export class OnboardingService {
     };
   }
 
-  async getAchievementStages(tenantId: string): Promise<AchievementStagesSetupResponseDto> {
+  async getAchievementStages(
+    tenantId: string,
+  ): Promise<AchievementStagesSetupResponseDto> {
     const stages = await this.prisma.achievementStage.findMany({
       where: { tenantId, isActive: true },
-      orderBy: { order: 'asc' },
+      orderBy: { order: "asc" },
     });
 
     return {
@@ -670,18 +790,16 @@ export class OnboardingService {
 
     // Validate all required steps are completed
     const requiredFlags = [
-      'profileCompleted',
-      'businessIdentityCompleted',
-      'salesPlanCompleted',
-      'activityConfigCompleted',
-      'salesCycleCompleted',
-      'achievementStagesCompleted',
-      'subscriptionCompleted',
+      "profileCompleted",
+      "businessIdentityCompleted",
+      "salesPlanCompleted",
+      "activityConfigCompleted",
+      "salesCycleCompleted",
+      "achievementStagesCompleted",
+      "subscriptionCompleted",
     ] as const;
 
-    const incompleteSteps = requiredFlags.filter(
-      (flag) => !progress[flag],
-    );
+    const incompleteSteps = requiredFlags.filter((flag) => !progress[flag]);
 
     if (incompleteSteps.length > 0) {
       throw new BadRequestException(
@@ -768,7 +886,10 @@ export class OnboardingService {
 
     // Auto-advance currentStep if this is the current step
     const stepNumber = STEP_TO_NUMBER[step];
-    if (progress.currentStep === stepNumber && stepNumber < MAX_ONBOARDING_STEPS) {
+    if (
+      progress.currentStep === stepNumber &&
+      stepNumber < MAX_ONBOARDING_STEPS
+    ) {
       updateData.currentStep = stepNumber + 1;
     }
 
