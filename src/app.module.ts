@@ -30,6 +30,7 @@ import { OpsModule } from "./ops/ops.module";
 import { DashboardModule } from "./dashboard/dashboard.module";
 import { NotificationsModule } from "./notifications/notifications.module";
 import { OnboardingModule } from "./onboarding/onboarding.module";
+import { CoachModule } from "./coach/coach.module";
 import { SuperadminModule } from "./superadmin/superadmin.module";
 import { HealthModule } from "./health/health.module";
 import { TenantThrottlerGuard } from "./common/guards/tenant-throttler.guard";
@@ -78,6 +79,7 @@ import { TenantRateLimitService } from "./common/rate-limit/tenant-rate-limit.se
     DashboardModule,
     NotificationsModule,
     OnboardingModule,
+    CoachModule,
     SuperadminModule,
     HealthModule,
   ],
